@@ -57,12 +57,14 @@ const Comment = ({ username, likes, comment }: CommentType) => {
 
 function Comments({ comments }: { comments: CommentType[] }) {
   const classes = useStyles();
-
+  const sortedComments = comments.sort(
+    (a, b) => Number(b.likes || 0) - Number(a.likes || 0)
+  );
   return (
     <>
-      {comments.length ? (
+      {sortedComments.length ? (
         <Grid container spacing={3}>
-          {comments.map((comment) => (
+          {sortedComments.map((comment) => (
             <Grid item xs={12}>
               <Comment {...comment}></Comment>
             </Grid>
