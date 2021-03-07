@@ -1,25 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import {
+  HashRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from "react-router-dom";
+import "./App.css";
+import Loader from "./components/Loader/Loader";
+import CommentsPropider from "./Provider/CommentsProvider";
+import VideosPropider from "./Provider/VideosProvider";
+import ChannelDetails from "./views/ChannelDetails/ChannelDetails";
+import Home from "./views/Home/Home";
+import Page404 from "./views/Page404/Page404";
+import VideoDetails from "./views/VideoDetails/VideoDetails";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <CommentsPropider>
+      <VideosPropider>
+        <Router>
+          <Switch>
+            <Route path="/" component={Home} exact></Route>
+            <Route path="/video/:id" component={VideoDetails} exact></Route>
+            <Route path="/channel/:id" component={ChannelDetails} exact></Route>
+            <Route path="/404" component={Page404}></Route>
+            <Redirect to="/404"></Redirect>
+          </Switch>
+        </Router>
+      </VideosPropider>
+    </CommentsPropider>
   );
 }
 
