@@ -95,3 +95,43 @@ export const ChannelAvancedDetails = [
   "Average Q scrore",
   "Average Likes per views",
 ];
+
+export interface Chart {
+  metric: string;
+  backgroundColor: string;
+  borderColor: string;
+  title: string;
+}
+
+export const ChannelCharts: Chart[] = [
+  {
+    metric: "SKEW(comments.likes)",
+    backgroundColor: "rgb(255, 99, 132)",
+    borderColor: "rgba(255, 99, 132, 0.2)",
+    title: "Trend of skewness of likes distribution in comments",
+  },
+  {
+    metric: "q_score",
+    backgroundColor: "rgb(23, 165, 137 )",
+    borderColor: "rgba(23, 165, 137, 0.2)",
+    title: "Trend of q score",
+  },
+  {
+    metric: "likes_rate",
+    backgroundColor: "rgb(165, 105, 189 )",
+    borderColor: "rgba(165, 105, 189 , 0.2)",
+    title: "Trend of  like rate",
+  },
+  {
+    metric: "comments_rate",
+    backgroundColor: "rgb(52, 152, 219 )",
+    borderColor: "rgba(52, 152, 219 , 0.2)",
+    title: "Trend of comment rate",
+  },
+  {
+    metric: "NUM_UNIQUE(comments.username)",
+    backgroundColor: "rgb(230, 126, 34)",
+    borderColor: "rgba(230, 126, 34 , 0.2)",
+    title: "Trend of unique commenters",
+  },
+];

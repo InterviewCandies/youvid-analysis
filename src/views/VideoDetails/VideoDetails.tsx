@@ -35,10 +35,11 @@ import { Mapper } from "../../utils/mapper";
 import { formatNumber } from "../../utils/numberFormatHelper";
 import { videosContext } from "../../Provider/VideosProvider";
 import { commentsContext } from "../../Provider/CommentsProvider";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Loader from "../../components/Loader/Loader";
 import Logo from "../../assets/img/logo.png";
 import { channelsContext } from "../../Provider/ChannelsProvider";
+import NavBar from "../../components/Navbar/NavBar";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,10 +80,16 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     fontSize: theme.spacing(4),
   },
+  link: {
+    fontWeight: 600,
+    fontSize: theme.spacing(4),
+    color: theme.palette.primary.main,
+    textDecoration: "none",
+  },
   row: {
     display: "flex",
     alignItems: "center",
-    gap: theme.spacing(1),
+    gap: theme.spacing(2),
     marginBottom: theme.spacing(2),
   },
   header: {
@@ -128,81 +135,114 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     textTransform: "none",
-    backgroundColor: "#3b3f46",
-    color: "#fff",
+    padding: "0.75rem 1rem",
     fontWeight: 600,
     fontSize: "18px",
   },
 }));
 
 interface Props {
-  primary: string;
-  secondary: string;
+  gradient: string;
 }
 
 const useCardStyles = makeStyles<Theme, Props>((theme) => ({
   card: {
     display: "flex",
-    flexDirection: "column",
-    position: "relative",
-    minWidth: "200px",
-    borderRadius: "5px",
-    backgroundColor: (props) => props.primary,
-    boxShadow:
-      "0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%)",
-    "& > :nth-child(even)": {
-      backgroundColor: (props) => props.secondary,
-    },
+    justifyContent: "center",
+    gap: "2rem",
   },
-  cardRow: {
+  circle: {
     display: "flex",
-    flexWrap: "wrap",
-    padding: theme.spacing(3),
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f9f9f9",
+    width: "9rem",
+    height: "9rem",
+    borderRadius: "50%",
+  },
+  border: {
+    width: "10rem",
+    height: "10rem",
+    background: (props) => props.gradient,
+    borderRadius: "50%",
+    boxSizing: "border-box",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  row: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "2rem",
+    width: "100%",
+    alignItems: "center",
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
+  block: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "1rem",
+    width: "18rem",
   },
 }));
 
 function CardDetails({ video }: { video: VideoType }) {
-  const classes = useCardStyles({ secondary: "#fff", primary: "#f1f1f1" });
+  const classes = useCardStyles({
+    gradient: "linear-gradient(to right, #0052d4, #4364f7, #6fb1fc)",
+  });
+
+  return (
+    <Grid container className={classes.card}>
+      <Typography variant="h5" style={{ fontWeight: 600 }}>
+        Video
+      </Typography>
+      <div className={classes.row}>
+        {VideoAvancedDetails.map((item) => (
+          <div key={item} className={classes.block}>
+            <div className={classes.border}>
+              <div className={classes.circle}>
+                <Typography variant="h4">
+                  {formatNumber(video[Mapper["video"][item]] || 0)}
+                </Typography>
+              </div>
+            </div>
+            <Typography variant="h6">{item}</Typography>
+          </div>
+        ))}
+      </div>
+    </Grid>
+  );
+}
+
+export function ChannelOverviewCard({ channel }: { channel: ChannelType }) {
+  const classes = useCardStyles({
+    gradient: "linear-gradient(to right, #f953c6, #b91d73);",
+  });
 
   return (
     <Grid container className={classes.card}>
       <div className={classes.cardRow} style={{ justifyContent: "center" }}>
         <Typography variant="h5" style={{ fontWeight: 600 }}>
-          Video
-        </Typography>
-      </div>
-      {VideoAvancedDetails.map((item) => (
-        <div className={classes.cardRow}>
-          <Typography variant="h6">{item}</Typography>
-          <Typography variant="h6">
-            {formatNumber(video[Mapper["video"][item]] || 0)}
-          </Typography>
-        </div>
-      ))}
-    </Grid>
-  );
-}
-
-function ChannelOverviewCard({ channel }: { channel: ChannelType }) {
-  const classes = useCardStyles({ primary: "#4299e1", secondary: "#67ade7" });
-
-  return (
-    <Grid container className={classes.card} style={{ color: "#fff" }}>
-      <div className={classes.cardRow} style={{ justifyContent: "center" }}>
-        <Typography variant="h5" style={{ fontWeight: 600 }}>
           Channel
         </Typography>
       </div>
-      {ChannelAvancedDetails.map((item) => (
-        <div className={classes.cardRow}>
-          <Typography variant="h6">{item.replace("Channel ", "")}</Typography>
-          <Typography variant="h6">
-            {formatNumber(channel[Mapper["channel"][item]] || 0)}
-          </Typography>
-        </div>
-      ))}
+      <div className={classes.row}>
+        {ChannelAvancedDetails.map((item) => (
+          <div key={item} className={classes.block}>
+            <div className={classes.border}>
+              <div className={classes.circle}>
+                <Typography variant="h4">
+                  {formatNumber(channel[Mapper["channel"][item]] || 0)}
+                </Typography>
+              </div>
+            </div>
+            <Typography variant="h6">{item.replace("Channel ", "")}</Typography>
+          </div>
+        ))}
+      </div>
     </Grid>
   );
 }
@@ -220,7 +260,6 @@ function VideoDetails() {
   const currentChannel = channels.find(
     (channel) => channel?.channel_id === currentVideo?.channel_id
   );
-  console.log(currentChannel);
   const searchRef = useRef(null);
   const currentComments = comments.length
     ? comments.filter((comment) => comment?.video_id === id)
@@ -258,30 +297,10 @@ function VideoDetails() {
   }
   return (
     <>
-      {currentVideo && currentComments && currentChannel ? (
+      {currentVideo && currentChannel ? (
         <>
-          <div className={classes.header}>
-            <div className={classes.box}>
-              <img
-                src={Logo}
-                alt="youvid-analysis"
-                className={classes.logo}
-                onClick={() => history.push("/")}
-              ></img>
-              <SearchBar ref={searchRef}></SearchBar>
-            </div>
-            <Button
-              startIcon={<TouchApp></TouchApp>}
-              variant="contained"
-              disabled={!currentVideo}
-              className={classes.button}
-              onClick={() => {
-                history.push("/video/" + pickAVideo());
-              }}
-            >
-              Pick a video
-            </Button>
-          </div>
+          <NavBar theme="dark" ref={searchRef}></NavBar>
+
           <Grid container className={classes.root}>
             <Grid
               item
@@ -290,9 +309,34 @@ function VideoDetails() {
               spacing={3}
               className={classes.videoSection}
             >
+              <Grid
+                item
+                xs={12}
+                style={{ justifyContent: "flex-end", display: "flex" }}
+              >
+                <Button
+                  color="primary"
+                  startIcon={<TouchApp></TouchApp>}
+                  variant="contained"
+                  disabled={!currentVideo}
+                  className={classes.button}
+                  onClick={() => {
+                    history.push("/video/" + pickAVideo());
+                  }}
+                >
+                  Pick a video
+                </Button>
+              </Grid>
               <div>
                 <div className={classes.row}>
                   <Typography className={classes.heading}>Channel</Typography>
+                  <Link
+                    to={"/channel/" + currentChannel.channel_id}
+                    target="_blank"
+                    className={classes.link}
+                  >
+                    {currentVideo.username_channel}
+                  </Link>
                 </div>
                 <Grid container spacing={2}>
                   {Object.keys(ChannelOverview).map((item) => (
@@ -356,12 +400,12 @@ function VideoDetails() {
                   </Typography>
                 </div>
                 <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={6}>
                     <ChannelOverviewCard
                       channel={currentChannel}
                     ></ChannelOverviewCard>
                   </Grid>
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={6}>
                     <CardDetails video={currentVideo}></CardDetails>
                   </Grid>
                 </Grid>

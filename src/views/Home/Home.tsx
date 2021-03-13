@@ -1,12 +1,14 @@
 import classes from "*.module.css";
-import { makeStyles } from "@material-ui/core";
+import { Button, makeStyles } from "@material-ui/core";
 import React, { useEffect, useRef } from "react";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import Background from "../../assets/img/register_bg_2.png";
-import { VideoType } from "../../types/types";
+import { ChannelType, VideoType } from "../../types/types";
 import { videosContext } from "../../Provider/VideosProvider";
 import { useHistory } from "react-router-dom";
 import Logo from "../../assets/img/logo.png";
+import { channelsContext } from "../../Provider/ChannelsProvider";
+import { YouTube } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,33 +39,35 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 100,
     marginBottom: theme.spacing(2),
   },
+  buttons: {
+    display: "flex",
+    gap: "2rem",
+  },
+  button: {
+    padding: "0.75rem 1rem",
+    backgroundColor: "#3b3f46",
+    color: "#fff",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#3b3f46",
+    },
+  },
 }));
 
 function Home() {
   const classes = useStyles();
-  const searchRef = useRef(null);
-  const videos: VideoType[] = React.useContext(videosContext);
   const history = useHistory();
+  const videos: VideoType[] = React.useContext(videosContext);
+  const channels: ChannelType[] = React.useContext(channelsContext);
 
-  useEffect(() => {
-    if (searchRef.current)
-      //@ts-ignore
-      searchRef.current.onkeyup = (e) => {
-        //@ts-ignore
-        if (e.key === "Enter" || e.keyCode === 13) {
-          //@ts-ignore
-          const searchKey = e.target.value;
-          const video = videos.find((video) => video.id === searchKey.trim());
+  const pickRandomly = (
+    data: VideoType[] | ChannelType[],
+    id: string
+  ): string | undefined => {
+    const ids = data.map((item) => item[id]);
+    return ids[Math.floor(Math.random() * ids.length)];
+  };
 
-          if (video?.id) history.push("/video/" + video.id);
-          else {
-            alert("Video does not exsit");
-            //@ts-ignore
-            e.target.value = "";
-          }
-        }
-      };
-  }, [searchRef, videos]);
   return (
     <main>
       <section className={classes.root}>
@@ -74,7 +78,26 @@ function Home() {
           }}
         ></div>
         <img src={Logo} className={classes.logo}></img>
-        <SearchBar ref={searchRef} autoFocus></SearchBar>
+        <div className={classes.buttons}>
+          <Button
+            variant="contained"
+            className={classes.button}
+            onClick={() => {
+              history.push(`/video/${pickRandomly(videos, "id")}`);
+            }}
+          >
+            Go to video
+          </Button>
+          <Button
+            variant="contained"
+            className={classes.button}
+            onClick={() => {
+              history.push(`/channel/${pickRandomly(channels, "channel_id")}`);
+            }}
+          >
+            Go to channel
+          </Button>
+        </div>
       </section>
     </main>
   );

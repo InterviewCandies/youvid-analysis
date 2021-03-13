@@ -17,15 +17,18 @@ interface Props {
   content: string | number;
   color: string;
   endorment: JSX.Element;
+  theme?: "dark" | "light";
 }
 
 const useStyles = makeStyles<Theme, Props>((theme) => ({
   root: {
+    textAlign: "left",
     padding: theme.spacing(3),
     position: "relative",
     minWidth: "150px",
     borderRadius: "5px",
-    backgroundColor: "#fff",
+    backgroundColor: (props) =>
+      props?.theme && props.theme === "dark" ? "#3b3f46" : "#fff",
     boxShadow:
       "0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%)",
   },

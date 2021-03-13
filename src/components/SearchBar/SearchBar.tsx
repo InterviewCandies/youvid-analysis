@@ -1,15 +1,27 @@
-import { InputAdornment, makeStyles, TextField } from "@material-ui/core";
+import {
+  InputAdornment,
+  makeStyles,
+  TextField,
+  Theme,
+} from "@material-ui/core";
 import { Search } from "@material-ui/icons";
 import React, { forwardRef } from "react";
 
-const useStyles = makeStyles(() => ({
+interface Props {
+  defaultValue?: string;
+  autoFocus?: boolean;
+  theme?: "dark" | "light";
+}
+const useStyles = makeStyles<Theme, Props>((theme) => ({
   input: {
-    backgroundColor: "#3b3f46",
+    backgroundColor: (props) =>
+      props?.theme && props.theme === "dark" ? "#3b3f46" : "#1e2328",
     border: "none",
     outline: "none",
     borderRadius: "5px",
-    width: "40rem",
-    color: "#fff",
+    width: "28rem",
+    color: (props) =>
+      props?.theme && props.theme === "dark" ? "#fff" : "#fff",
     ["@media (max-width:700px)"]: {
       width: "19rem",
     },
@@ -37,33 +49,28 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const SearchBar = forwardRef(
-  (
-    { defaultValue, autoFocus }: { defaultValue?: string; autoFocus?: boolean },
-    ref
-  ) => {
-    const classes = useStyles();
+const SearchBar = forwardRef((props: Props, ref) => {
+  const classes = useStyles(props);
 
-    return (
-      <TextField
-        className={classes.focus}
-        variant="outlined"
-        ref={ref as any}
-        autoFocus={autoFocus || false}
-        placeholder="Search video..."
-        id="input-with-icon-textfield"
-        defaultValue={defaultValue || ""}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search className={classes.icon}></Search>{" "}
-            </InputAdornment>
-          ),
-          className: classes.input,
-        }}
-      />
-    );
-  }
-);
+  return (
+    <TextField
+      className={classes.focus}
+      variant="outlined"
+      ref={ref as any}
+      autoFocus={props.autoFocus || false}
+      placeholder="Search id..."
+      id="input-with-icon-textfield"
+      defaultValue={props.defaultValue || ""}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <Search className={classes.icon}></Search>{" "}
+          </InputAdornment>
+        ),
+        className: classes.input,
+      }}
+    />
+  );
+});
 
 export default SearchBar;
