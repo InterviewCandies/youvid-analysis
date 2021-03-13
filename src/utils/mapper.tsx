@@ -19,11 +19,12 @@ export const Mapper: { [key: string]: { [key: string]: string } } = {
     "average dislikes": "MEAN(videos.dislike_count)",
     "average comments": "MEAN(videos.comment_count)",
     "Channel Average skewness of likes distribution in comments":
-      "SKEW(comments.likes)",
+      "MEAN(videos.SKEW(comments.likes))",
     "Average comments per views": "MEAN(videos.comments_rate)",
     "Channel Average likes of comments": "MEAN(comments.likes)",
     "Channel Minimum likes of comments": "MIN(comments.likes)",
-    "Channel Average unique commentors": "NUM_UNIQUE(comments.username)",
+    "Channel Average unique commentors":
+      "MEAN(videos.NUM_UNIQUE(comments.username))",
     "Average Q scrore": "MEAN(videos.q_score)",
     "Average Likes per views": "MEAN(videos.likes_rate)",
   },
