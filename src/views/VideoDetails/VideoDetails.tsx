@@ -23,6 +23,7 @@ import {
 import {
   ChannelAvancedDetails,
   ChannelOverview,
+  ChannelType,
   CommentType,
   VideoAvancedDetails,
   VideoOverview,
@@ -37,6 +38,7 @@ import { commentsContext } from "../../Provider/CommentsProvider";
 import { useHistory } from "react-router-dom";
 import Loader from "../../components/Loader/Loader";
 import Logo from "../../assets/img/logo.png";
+import { channelsContext } from "../../Provider/ChannelsProvider";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -175,7 +177,7 @@ function CardDetails({ video }: { video: VideoType }) {
         <div className={classes.cardRow}>
           <Typography variant="h6">{item}</Typography>
           <Typography variant="h6">
-            {formatNumber(video[Mapper[item]] || 0)}
+            {formatNumber(video[Mapper["video"][item]] || 0)}
           </Typography>
         </div>
       ))}
@@ -183,7 +185,7 @@ function CardDetails({ video }: { video: VideoType }) {
   );
 }
 
-function ChannelOverviewCard({ video }: { video: VideoType }) {
+function ChannelOverviewCard({ channel }: { channel: ChannelType }) {
   const classes = useCardStyles({ primary: "#4299e1", secondary: "#67ade7" });
 
   return (
@@ -197,7 +199,7 @@ function ChannelOverviewCard({ video }: { video: VideoType }) {
         <div className={classes.cardRow}>
           <Typography variant="h6">{item.replace("Channel ", "")}</Typography>
           <Typography variant="h6">
-            {formatNumber(video[Mapper[item]] || 0)}
+            {formatNumber(channel[Mapper["channel"][item]] || 0)}
           </Typography>
         </div>
       ))}
@@ -210,9 +212,15 @@ function VideoDetails() {
   const [loading, setLoading] = React.useState<Boolean>(true);
   const videos: VideoType[] = React.useContext(videosContext);
   const comments: CommentType[] = React.useContext(commentsContext);
+  const channels: ChannelType[] = React.useContext(channelsContext);
+
   const url = window.location.hash;
   const id: string = url.substring(url.lastIndexOf("/") + 1);
   const currentVideo = videos.find((video) => video?.id === id);
+  const currentChannel = channels.find(
+    (channel) => channel?.channel_id === currentVideo?.channel_id
+  );
+  console.log(currentChannel);
   const searchRef = useRef(null);
   const currentComments = comments.length
     ? comments.filter((comment) => comment?.video_id === id)
@@ -250,7 +258,7 @@ function VideoDetails() {
   }
   return (
     <>
-      {currentVideo && currentComments ? (
+      {currentVideo && currentComments && currentChannel ? (
         <>
           <div className={classes.header}>
             <div className={classes.box}>
@@ -291,7 +299,9 @@ function VideoDetails() {
                     <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
                       <Card
                         title={item}
-                        content={formatNumber(currentVideo[Mapper[item]] || 0)}
+                        content={formatNumber(
+                          currentChannel[Mapper["channel"][item]] || 0
+                        )}
                         color={ChannelOverview[item].color}
                         endorment={ChannelOverview[item].endorment}
                       ></Card>
@@ -309,7 +319,9 @@ function VideoDetails() {
                     <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
                       <Card
                         title={item}
-                        content={formatNumber(currentVideo[Mapper[item]] || 0)}
+                        content={formatNumber(
+                          currentVideo[Mapper["video"][item]] || 0
+                        )}
                         color={VideoOverview[item].color}
                         endorment={VideoOverview[item].endorment}
                       ></Card>
@@ -346,7 +358,7 @@ function VideoDetails() {
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={6}>
                     <ChannelOverviewCard
-                      video={currentVideo}
+                      channel={currentChannel}
                     ></ChannelOverviewCard>
                   </Grid>
                   <Grid item xs={12} md={6}>
