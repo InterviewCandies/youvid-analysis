@@ -64,7 +64,7 @@ const useStyles = makeStyles<Theme, Props>((theme) => ({
 }));
 function Card(props: Props) {
   const classes = useStyles(props);
-
+  const eventKey: string = "123";
   return (
     <div className={classes.root}>
       <Typography className={classes.title}>{props.title}</Typography>

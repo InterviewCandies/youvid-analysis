@@ -76,6 +76,7 @@ const getOptions = (color: string) => {
         {
           ticks: {
             fontColor: color || "white",
+            beginAtZero: true,
           },
           gridLines: {
             color: "#1e2328",

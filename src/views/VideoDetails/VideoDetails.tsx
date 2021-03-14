@@ -44,10 +44,12 @@ import CommentsDetails from "../../components/CommentsDetails/CommentsDetails";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#1e2328",
+    color: "#fff",
   },
   videoSection: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#1e2328",
+    color: "#fff",
     minHeight: "100vh",
     padding: theme.spacing(4),
     "& > :not(:first-child)": {
@@ -84,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
   link: {
     fontWeight: 600,
     fontSize: theme.spacing(4),
-    color: theme.palette.primary.main,
+    color: theme.palette.secondary.main,
     textDecoration: "none",
   },
   row: {
@@ -127,10 +129,10 @@ const useStyles = makeStyles((theme) => ({
   comments: {
     width: "100%",
     height: "90vh",
+    backgroundColor: "#3b3f46",
     boxShadow:
       "0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%)",
     borderRadius: "16px",
-    backgroundColor: "#fff",
     padding: theme.spacing(3),
     overflow: "auto",
   },
@@ -156,7 +158,7 @@ const useCardStyles = makeStyles<Theme, Props>((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#1e2328",
     width: "9rem",
     height: "9rem",
     borderRadius: "50%",
@@ -320,7 +322,7 @@ function VideoDetails() {
     <>
       {currentVideo && currentChannel ? (
         <>
-          <NavBar theme="dark" ref={searchRef}></NavBar>
+          <NavBar theme="light" ref={searchRef}></NavBar>
 
           <Grid container className={classes.root}>
             <Grid
@@ -336,7 +338,7 @@ function VideoDetails() {
                 style={{ justifyContent: "flex-end", display: "flex" }}
               >
                 <Button
-                  color="primary"
+                  color="secondary"
                   startIcon={<TouchApp></TouchApp>}
                   variant="contained"
                   disabled={!currentVideo}
@@ -364,6 +366,7 @@ function VideoDetails() {
                     <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
                       <Card
                         title={item}
+                        theme="dark"
                         content={formatNumber(
                           currentChannel[Mapper["channel"][item]] || 0
                         )}
@@ -383,6 +386,7 @@ function VideoDetails() {
                   {Object.keys(VideoOverview).map((item) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
                       <Card
+                        theme="dark"
                         title={item}
                         content={formatNumber(
                           currentVideo[Mapper["video"][item]] || 0
@@ -451,7 +455,7 @@ function VideoDetails() {
 
                 <Button
                   onClick={() => setOpenModal(true)}
-                  color="primary"
+                  color="secondary"
                   style={{ textTransform: "none" }}
                 >
                   See more
@@ -479,7 +483,6 @@ function VideoDetails() {
       ) : (
         <Loader></Loader>
       )}
-      ;
     </>
   );
 }
