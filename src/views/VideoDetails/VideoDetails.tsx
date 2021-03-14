@@ -16,6 +16,7 @@ import Card from "../../components/Card/Card";
 import {
   AssignmentInd,
   Comment,
+  OpenInNew,
   Search,
   TouchApp,
   YouTube,
@@ -88,6 +89,9 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.spacing(4),
     color: theme.palette.secondary.main,
     textDecoration: "none",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
   },
   row: {
     display: "flex",
@@ -129,6 +133,7 @@ const useStyles = makeStyles((theme) => ({
   comments: {
     width: "100%",
     height: "90vh",
+    marginTop: "2rem",
     backgroundColor: "#3b3f46",
     boxShadow:
       "0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%)",
@@ -291,7 +296,10 @@ function VideoDetails() {
 
   const pickAVideo = (): string | undefined => {
     const ids = videos.map((video) => video.id);
-    return ids[Math.floor(Math.random() * ids.length)];
+    let selectedId = null;
+    while (!selectedId)
+      selectedId = ids[Math.floor(Math.random() * ids.length)];
+    return selectedId;
   };
 
   useEffect(() => {
@@ -359,6 +367,9 @@ function VideoDetails() {
                     className={classes.link}
                   >
                     {currentVideo.username_channel}
+                    <Icon color="secondary">
+                      <OpenInNew></OpenInNew>
+                    </Icon>
                   </Link>
                 </div>
                 <Grid container spacing={2}>

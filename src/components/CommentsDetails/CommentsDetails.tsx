@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     top: "0px",
     right: "0px",
-    color: "#000",
+    color: "#fff",
   },
 }));
 
@@ -88,7 +88,16 @@ function CommentsDetails({
   );
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      PaperProps={{
+        style: {
+          backgroundColor: "#3b3f46",
+          color: "#fff",
+        },
+      }}
+    >
       <div className={classes.title}>
         <Typography variant="h6">Likes in comments</Typography>
         <IconButton onClick={handleClose}>

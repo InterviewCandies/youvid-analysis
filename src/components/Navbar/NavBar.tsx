@@ -67,7 +67,9 @@ const pickRandomly = (
   data: VideoType[] | ChannelType[],
   id: string
 ): string | undefined => {
-  const ids = data.map((item) => item[id]);
+  const ids = data
+    .map((item) => item[id])
+    .filter((item) => item !== undefined && item !== null);
   return ids[Math.floor(Math.random() * ids.length)];
 };
 

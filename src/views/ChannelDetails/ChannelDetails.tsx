@@ -19,6 +19,7 @@ import Card from "../../components/Card/Card";
 import { ChannelOverviewCard } from "../VideoDetails/VideoDetails";
 import NavBar from "../../components/Navbar/NavBar";
 import Loader from "../../components/Loader/Loader";
+import { videosContext } from "../../Provider/VideosProvider";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -111,7 +112,12 @@ function ChannelDetails() {
   const history = useHistory();
   const searchRef = useRef(null);
   const channels = React.useContext(channelsContext);
+  const videos = React.useContext(videosContext);
   const currentChannel = channels.find((channel) => channel?.channel_id === id);
+  const channelName = videos.find((video) => video.channel_id === id)?.[
+    "username_channel"
+  ];
+
   useEffect(() => {
     async function getData() {
       const parseData = (await readCSV("/video_by_month.csv")) as [];
@@ -126,13 +132,11 @@ function ChannelDetails() {
     ChannelCharts.find((chart) => chart.metric === mainChart) ||
     ChannelCharts[0];
 
-  const pickAChannel = (): string | undefined => {
+  const pickAChannel = (): string => {
     const ids = channels.map((channel) => channel.channel_id);
-    console.log(ids);
-    const inx = Math.floor(Math.random() * ids.length);
-    const id = ids[inx];
-    console.log(id, inx);
-    return id;
+    let channelId = null;
+    while (!channelId) channelId = ids[Math.floor(Math.random() * ids.length)];
+    return channelId;
   };
 
   useEffect(() => {
@@ -166,8 +170,13 @@ function ChannelDetails() {
           <Grid
             item
             xs={12}
-            style={{ justifyContent: "flex-end", display: "flex" }}
+            style={{
+              justifyContent: "space-between",
+              alignItems: "center",
+              display: "flex",
+            }}
           >
+            <Typography variant="h4">{channelName}</Typography>
             <Button
               startIcon={<TouchApp></TouchApp>}
               variant="contained"

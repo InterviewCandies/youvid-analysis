@@ -9,6 +9,7 @@ import { useHistory } from "react-router-dom";
 import Logo from "../../assets/img/logo.png";
 import { channelsContext } from "../../Provider/ChannelsProvider";
 import { YouTube } from "@material-ui/icons";
+import Loader from "../../components/Loader/Loader";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,42 +64,51 @@ function Home() {
   const pickRandomly = (
     data: VideoType[] | ChannelType[],
     id: string
-  ): string | undefined => {
+  ): string => {
     const ids = data.map((item) => item[id]);
-    return ids[Math.floor(Math.random() * ids.length)];
+    let selectedId = null;
+    while (!selectedId)
+      selectedId = ids[Math.floor(Math.random() * ids.length)];
+    return selectedId;
   };
 
   return (
     <main>
-      <section className={classes.root}>
-        <div
-          className={classes.image}
-          style={{
-            backgroundImage: `url(${Background})`,
-          }}
-        ></div>
-        <img src={Logo} className={classes.logo}></img>
-        <div className={classes.buttons}>
-          <Button
-            variant="contained"
-            className={classes.button}
-            onClick={() => {
-              history.push(`/video/${pickRandomly(videos, "id")}`);
+      {videos.length && channels.length ? (
+        <section className={classes.root}>
+          <div
+            className={classes.image}
+            style={{
+              backgroundImage: `url(${Background})`,
             }}
-          >
-            Go to video
-          </Button>
-          <Button
-            variant="contained"
-            className={classes.button}
-            onClick={() => {
-              history.push(`/channel/${pickRandomly(channels, "channel_id")}`);
-            }}
-          >
-            Go to channel
-          </Button>
-        </div>
-      </section>
+          ></div>
+          <img src={Logo} className={classes.logo}></img>
+          <div className={classes.buttons}>
+            <Button
+              variant="contained"
+              className={classes.button}
+              onClick={() => {
+                history.push(`/video/${pickRandomly(videos, "id")}`);
+              }}
+            >
+              Go to video
+            </Button>
+            <Button
+              variant="contained"
+              className={classes.button}
+              onClick={() => {
+                history.push(
+                  `/channel/${pickRandomly(channels, "channel_id")}`
+                );
+              }}
+            >
+              Go to channel
+            </Button>
+          </div>
+        </section>
+      ) : (
+        <Loader></Loader>
+      )}
     </main>
   );
 }
