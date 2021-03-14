@@ -45,7 +45,7 @@ const useStyles = makeStyles<Theme, Props>((theme) => ({
     },
   },
   number: {
-    fontSize: theme.spacing(2),
+    fontSize: theme.spacing(3),
   },
   icon: {
     position: "absolute",
@@ -68,7 +68,9 @@ function Card(props: Props) {
   return (
     <div className={classes.root}>
       <Typography className={classes.title}>{props.title}</Typography>
-      <Typography variant="h4">{props.content}</Typography>
+      <Typography variant="h4" className={classes.number}>
+        {props.content}
+      </Typography>
       <Icon className={classes.icon}>{props.endorment}</Icon>
     </div>
   );
