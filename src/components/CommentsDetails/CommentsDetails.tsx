@@ -51,7 +51,6 @@ const getData = (labels: string[], data: number[]) => {
           "rgba(165, 105, 189 , 0.2)",
           "rgba(52, 152, 219 , 0.2)",
           "rgba(230, 126, 34 , 0.2)",
-          "rbga(247, 249, 249 , 0.2)",
         ],
         borderColor: [
           "rgba(255, 99, 132, 1)",
@@ -59,7 +58,6 @@ const getData = (labels: string[], data: number[]) => {
           "rgba(165, 105, 189 , 1)",
           "rgba(52, 152, 219 , 1)",
           "rgba(230, 126, 34 , 1)",
-          "rbga(247, 249, 249, 1)",
         ],
         borderWidth: 1,
       },
@@ -102,10 +100,10 @@ function CommentsDetails({
           <Grid item xs={12} className={classes.box}>
             <Pie
               data={getData(
-                Object.keys(commentStats).slice(1),
+                Object.keys(commentStats).slice(2),
                 Object.values(commentStats)
                   .map((item) => Number(item || "0"))
-                  .slice(1)
+                  .slice(2)
               )}
               width={400}
               height={400}
