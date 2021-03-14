@@ -68,7 +68,7 @@ const getOptions = (color: string) => {
             fontColor: color || "white",
           },
           gridLines: {
-            color: "#3b3f46",
+            color: "#1e2328",
           },
         },
       ],
@@ -78,7 +78,7 @@ const getOptions = (color: string) => {
             fontColor: color || "white",
           },
           gridLines: {
-            color: "#3b3f46",
+            color: "#1e2328",
           },
         },
       ],
@@ -196,7 +196,15 @@ function ChannelDetails() {
               ))}
             </Grid>
           </Grid>
-          <Grid item xs={12}>
+          <Grid
+            item
+            xs={12}
+            style={{
+              backgroundColor: "#3b3f46",
+              padding: "0.75rem",
+              borderRadius: "10px",
+            }}
+          >
             <Line
               data={filterData(data, bigChart)}
               height={300}

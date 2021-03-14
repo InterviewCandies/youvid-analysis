@@ -22,7 +22,6 @@ interface Props {
 
 const useStyles = makeStyles<Theme, Props>((theme) => ({
   root: {
-    textAlign: "left",
     padding: theme.spacing(3),
     position: "relative",
     minWidth: "150px",
@@ -35,6 +34,8 @@ const useStyles = makeStyles<Theme, Props>((theme) => ({
   title: {
     fontWeight: 700,
     color: "#a0aec0",
+    textAlign: "left",
+
     textTransform: "uppercase",
     ["@media (min-width:1275px)"]: {
       fontSize: "13px",

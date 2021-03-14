@@ -40,6 +40,7 @@ import Loader from "../../components/Loader/Loader";
 import Logo from "../../assets/img/logo.png";
 import { channelsContext } from "../../Provider/ChannelsProvider";
 import NavBar from "../../components/Navbar/NavBar";
+import CommentsDetails from "../../components/CommentsDetails/CommentsDetails";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -186,6 +187,23 @@ const useCardStyles = makeStyles<Theme, Props>((theme) => ({
     alignItems: "center",
     gap: "1rem",
     width: "18rem",
+    ["@media (max-width:500px)"]: {
+      width: "10rem",
+    },
+  },
+  subtitle: {
+    fontSize: "1.25rem",
+    textAlign: "center",
+    ["@media (max-width:500px)"]: {
+      fontSize: "1rem",
+    },
+  },
+  heading: {
+    fontSize: "1.75rem",
+    fontWeight: "bold",
+    ["@media (max-width:500px)"]: {
+      fontSize: "1rem",
+    },
   },
 }));
 
@@ -204,12 +222,12 @@ function CardDetails({ video }: { video: VideoType }) {
           <div key={item} className={classes.block}>
             <div className={classes.border}>
               <div className={classes.circle}>
-                <Typography variant="h4">
+                <Typography variant="h4" className={classes.heading}>
                   {formatNumber(video[Mapper["video"][item]] || 0)}
                 </Typography>
               </div>
             </div>
-            <Typography variant="h6">{item}</Typography>
+            <Typography className={classes.subtitle}>{item}</Typography>
           </div>
         ))}
       </div>
@@ -234,12 +252,14 @@ export function ChannelOverviewCard({ channel }: { channel: ChannelType }) {
           <div key={item} className={classes.block}>
             <div className={classes.border}>
               <div className={classes.circle}>
-                <Typography variant="h4">
+                <Typography variant="h4" className={classes.heading}>
                   {formatNumber(channel[Mapper["channel"][item]] || 0)}
                 </Typography>
               </div>
             </div>
-            <Typography variant="h6">{item.replace("Channel ", "")}</Typography>
+            <Typography className={classes.subtitle}>
+              {item.replace("Channel ", "")}
+            </Typography>
           </div>
         ))}
       </div>
@@ -253,6 +273,7 @@ function VideoDetails() {
   const videos: VideoType[] = React.useContext(videosContext);
   const comments: CommentType[] = React.useContext(commentsContext);
   const channels: ChannelType[] = React.useContext(channelsContext);
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
 
   const url = window.location.hash;
   const id: string = url.substring(url.lastIndexOf("/") + 1);
@@ -386,6 +407,7 @@ function VideoDetails() {
                   url={`https://www.youtube.com/watch?v=${id}`}
                   fallback={<CircularProgress></CircularProgress>}
                   onReady={() => setLoading(false)}
+                  playing
                   config={{
                     youtube: {
                       playerVars: { showinfo: 1 },
@@ -412,12 +434,37 @@ function VideoDetails() {
               </div>
             </Grid>
             <Grid item xs={12} lg={3} className={classes.comments}>
-              <div className={classes.row}>
-                <Icon className={classes.icon}>
-                  <Comment fontSize="small"></Comment>
-                </Icon>
-                <Typography variant="h5">Comments</Typography>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "1rem",
+                }}
+              >
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <Icon className={classes.icon}>
+                    <Comment fontSize="small"></Comment>
+                  </Icon>
+                  <Typography variant="h5">Comments</Typography>
+                </div>
+
+                <Button
+                  onClick={() => setOpenModal(true)}
+                  color="primary"
+                  style={{ textTransform: "none" }}
+                >
+                  See more
+                </Button>
               </div>
+
+              {currentComments && (
+                <CommentsDetails
+                  open={openModal}
+                  handleClose={() => setOpenModal(false)}
+                  comments={currentComments}
+                ></CommentsDetails>
+              )}
               {currentComments ? (
                 <Comments comments={currentComments}></Comments>
               ) : (
