@@ -11,18 +11,21 @@ import {
 import { Close } from "@material-ui/icons";
 import React from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
-import { CommentType } from "../../types/types";
+import { commentsStatsContext } from "../../Provider/CommentStatsProvider";
+import { CommentStatsType, CommentType } from "../../types/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     padding: "3rem",
   },
   box: {
-    width: "300px",
+    width: "500px",
+    ["@media (max-width:520px)"]: {
+      width: "300px",
+    },
   },
   title: {
     display: "flex",
-    width: "350px",
     padding: "1rem",
     justifyContent: "space-between",
     alignItems: "center",
@@ -41,17 +44,22 @@ const getData = (labels: string[], data: number[]) => {
     labels: [...labels],
     datasets: [
       {
-        label: "# of Votes",
         data: [...data],
         backgroundColor: [
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(23, 165, 137, 0.2)",
           "rgba(255, 99, 132, 0.2)",
+          "rgba(23, 165, 137, 0.2)",
+          "rgba(165, 105, 189 , 0.2)",
+          "rgba(52, 152, 219 , 0.2)",
+          "rgba(230, 126, 34 , 0.2)",
+          "rbga(247, 249, 249 , 0.2)",
         ],
         borderColor: [
-          "rgba(54, 162, 235, 1)",
-          "rgba(23, 165, 137, 1)",
           "rgba(255, 99, 132, 1)",
+          "rgba(23, 165, 137, 1)",
+          "rgba(165, 105, 189 , 1)",
+          "rgba(52, 152, 219 , 1)",
+          "rgba(230, 126, 34 , 1)",
+          "rbga(247, 249, 249, 1)",
         ],
         borderWidth: 1,
       },
@@ -59,33 +67,16 @@ const getData = (labels: string[], data: number[]) => {
   };
 };
 
-const filterComments = (
-  comments: CommentType[],
-  condition: (comment: CommentType) => boolean
-) => {
-  return comments.filter(condition).length;
-};
-
 function CommentsDetails({
   open,
   handleClose,
-  comments,
+  commentStats,
 }: {
   open: boolean;
   handleClose: () => void;
-  comments: CommentType[];
+  commentStats: CommentStatsType;
 }) {
   const classes = useStyles();
-
-  const mediumComments = filterComments(
-    comments,
-    (comment) =>
-      Number(comment.likes || 0) > 10 && Number(comment.likes || 0) <= 500
-  );
-  const highComments = filterComments(
-    comments,
-    (comment) => Number(comment.likes || 0) > 500
-  );
 
   return (
     <Dialog
@@ -111,21 +102,47 @@ function CommentsDetails({
           <Grid item xs={12} className={classes.box}>
             <Pie
               data={getData(
-                [
-                  "Comments with 1 to 10 likes",
-                  "Comments with 10 to 500 likes",
-                  "Comments with above 500 likes",
-                ],
-                [comments.length - highComments, mediumComments, highComments]
+                Object.keys(commentStats).slice(1),
+                Object.values(commentStats)
+                  .map((item) => Number(item || "0"))
+                  .slice(1)
               )}
-              width={300}
-              height={300}
+              width={400}
+              height={400}
               options={{
                 maintainAspectRatio: false,
                 legend: {
                   position: "bottom",
                   labels: {
                     padding: 20,
+                    fontColor: "#fff",
+                  },
+                },
+                //Thanks to: https://stackoverflow.com/a/37260662/14480038
+                tooltips: {
+                  callbacks: {
+                    //@ts-ignore
+                    label: function (tooltipItem, data) {
+                      //get the concerned dataset
+                      var dataset = data.datasets[tooltipItem.datasetIndex];
+                      //calculate the total of this data set
+                      var total = dataset.data.reduce(function (
+                        previousValue: number,
+                        currentValue: number,
+                        currentIndex: number,
+                        array: []
+                      ) {
+                        return previousValue + currentValue;
+                      });
+                      //get the current items value
+                      var currentValue = dataset.data[tooltipItem.index];
+                      //calculate the precentage based on the total and current item, also this does a rough rounding to give a whole number
+                      var percentage = Math.floor(
+                        (currentValue / total) * 100 + 0.5
+                      );
+
+                      return percentage + "%";
+                    },
                   },
                 },
               }}

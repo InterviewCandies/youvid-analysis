@@ -25,6 +25,7 @@ import {
   ChannelAvancedDetails,
   ChannelOverview,
   ChannelType,
+  CommentStatsType,
   CommentType,
   VideoAvancedDetails,
   VideoOverview,
@@ -42,6 +43,7 @@ import Logo from "../../assets/img/logo.png";
 import { channelsContext } from "../../Provider/ChannelsProvider";
 import NavBar from "../../components/Navbar/NavBar";
 import CommentsDetails from "../../components/CommentsDetails/CommentsDetails";
+import { commentsStatsContext } from "../../Provider/CommentStatsProvider";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -280,6 +282,10 @@ function VideoDetails() {
   const videos: VideoType[] = React.useContext(videosContext);
   const comments: CommentType[] = React.useContext(commentsContext);
   const channels: ChannelType[] = React.useContext(channelsContext);
+  const commentStats: CommentStatsType[] = React.useContext(
+    commentsStatsContext
+  );
+
   const [openModal, setOpenModal] = React.useState<boolean>(false);
 
   const url = window.location.hash;
@@ -288,6 +294,8 @@ function VideoDetails() {
   const currentChannel = channels.find(
     (channel) => channel?.channel_id === currentVideo?.channel_id
   );
+  const currentCommentStats = commentStats.find((item) => item.video_id === id);
+
   const searchRef = useRef(null);
   const currentComments = comments.length
     ? comments.filter((comment) => comment?.video_id === id)
@@ -473,18 +481,18 @@ function VideoDetails() {
                 </Button>
               </div>
 
-              {currentComments && (
+              {currentCommentStats && (
                 <CommentsDetails
                   open={openModal}
                   handleClose={() => setOpenModal(false)}
-                  comments={currentComments}
+                  commentStats={currentCommentStats}
                 ></CommentsDetails>
               )}
               {currentComments ? (
                 <Comments comments={currentComments}></Comments>
               ) : (
                 <div className={classes.loading}>
-                  <CircularProgress></CircularProgress>
+                  <CircularProgress color="secondary"></CircularProgress>
                   <Typography variant="h6">Loading comments...</Typography>
                 </div>
               )}
@@ -499,3 +507,6 @@ function VideoDetails() {
 }
 
 export default VideoDetails;
+function commentStatsContext(commentStatsContext: any): CommentStatsType[] {
+  throw new Error("Function not implemented.");
+}

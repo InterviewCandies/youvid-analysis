@@ -72,6 +72,10 @@ export interface CommentType {
   video_id?: string;
 }
 
+export interface CommentStatsType {
+  [key: string]: string | undefined;
+}
+
 export interface ChannelType {
   [key: string]: string | undefined;
 }
