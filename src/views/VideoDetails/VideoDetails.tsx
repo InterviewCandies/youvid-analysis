@@ -5,22 +5,21 @@ import {
   Icon,
   makeStyles,
   Theme,
-  ThemeProvider,
   Typography,
 } from "@material-ui/core";
-import React, { useContext, useEffect, useRef } from "react";
-import fs from "fs";
-import SearchBar from "../../components/SearchBar/SearchBar";
+import { Comment, OpenInNew, TouchApp } from "@material-ui/icons";
+import React, { useEffect, useRef } from "react";
 import ReactPlayer from "react-player";
+import { Link, useHistory } from "react-router-dom";
 import Card from "../../components/Card/Card";
-import {
-  AssignmentInd,
-  Comment,
-  OpenInNew,
-  Search,
-  TouchApp,
-  YouTube,
-} from "@material-ui/icons";
+import Comments from "../../components/Comments/Comments";
+import CommentsDetails from "../../components/CommentsDetails/CommentsDetails";
+import Loader from "../../components/Loader/Loader";
+import NavBar from "../../components/Navbar/NavBar";
+import { channelsContext } from "../../Provider/ChannelsProvider";
+import { commentsContext } from "../../Provider/CommentsProvider";
+import { commentsStatsContext } from "../../Provider/CommentStatsProvider";
+import { videosContext } from "../../Provider/VideosProvider";
 import {
   ChannelAvancedDetails,
   ChannelOverview,
@@ -31,19 +30,8 @@ import {
   VideoOverview,
   VideoType,
 } from "../../types/types";
-import Comments from "../../components/Comments/Comments";
-import Papa from "papaparse";
 import { Mapper } from "../../utils/mapper";
 import { formatNumber } from "../../utils/numberFormatHelper";
-import { videosContext } from "../../Provider/VideosProvider";
-import { commentsContext } from "../../Provider/CommentsProvider";
-import { Link, useHistory } from "react-router-dom";
-import Loader from "../../components/Loader/Loader";
-import Logo from "../../assets/img/logo.png";
-import { channelsContext } from "../../Provider/ChannelsProvider";
-import NavBar from "../../components/Navbar/NavBar";
-import CommentsDetails from "../../components/CommentsDetails/CommentsDetails";
-import { commentsStatsContext } from "../../Provider/CommentStatsProvider";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -402,19 +390,32 @@ function VideoDetails() {
                   <Typography className={classes.heading}>Video</Typography>
                 </div>
                 <Grid container spacing={3}>
-                  {Object.keys(VideoOverview).map((item) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
-                      <Card
-                        theme="dark"
-                        title={item}
-                        content={formatNumber(
-                          currentVideo[Mapper["video"][item]] || 0
-                        )}
-                        color={VideoOverview[item].color}
-                        endorment={VideoOverview[item].endorment}
-                      ></Card>
-                    </Grid>
-                  ))}
+                  {Object.keys(VideoOverview).map((item) => {
+                    let figure = Number(
+                      currentVideo[Mapper["video"][item]] || 0
+                    );
+                    if (item == "comments") {
+                      console.log(
+                        figure,
+                        currentVideo[Mapper["video"]["views"]]
+                      );
+                      figure =
+                        (figure *
+                          Number(currentVideo[Mapper["video"]["views"]] || 0)) /
+                        1000;
+                    }
+                    return (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
+                        <Card
+                          theme="dark"
+                          title={item}
+                          content={formatNumber(figure)}
+                          color={VideoOverview[item].color}
+                          endorment={VideoOverview[item].endorment}
+                        ></Card>
+                      </Grid>
+                    );
+                  })}
                 </Grid>
               </div>
               {loading && (
@@ -469,7 +470,7 @@ function VideoDetails() {
                   <Icon className={classes.icon}>
                     <Comment fontSize="small"></Comment>
                   </Icon>
-                  <Typography variant="h5">Comments</Typography>
+                  <Typography variant="h5">Top comments</Typography>
                 </div>
 
                 <Button

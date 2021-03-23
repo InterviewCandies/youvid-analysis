@@ -14,6 +14,7 @@ import VideosPropider from "./Provider/VideosProvider";
 import ChannelDetails from "./views/ChannelDetails/ChannelDetails";
 import Home from "./views/Home/Home";
 import Page404 from "./views/Page404/Page404";
+import ComparationTool from "./views/ComparationTool/ComparationTool";
 import VideoDetails from "./views/VideoDetails/VideoDetails";
 
 function App() {

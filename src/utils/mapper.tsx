@@ -2,15 +2,15 @@ export const Mapper: { [key: string]: { [key: string]: string } } = {
   video: {
     likes: "like_count",
     dislikes: "dislike_count",
-    comments: "COUNT(comments)",
+    comments: "comments_rate",
     views: "view_count",
     "Skewness of likes distribution in comments": "SKEW(comments.likes)",
-    "Comments per views": "comments_rate",
+    "Comment rate": "comments_rate",
     "Average likes of comments": "MEAN(comments.likes)",
     "Minimum likes of comments": "MIN(comments.likes)",
     "Unique commentors": "NUM_UNIQUE(comments.username)",
     "Q scrore": "q_score",
-    "Likes per views": "likes_rate",
+    "Like rate": "likes_rate",
   },
   channel: {
     videos: "COUNT(videos)",
@@ -20,12 +20,12 @@ export const Mapper: { [key: string]: { [key: string]: string } } = {
     "average comments": "MEAN(videos.comment_count)",
     "Channel Average skewness of likes distribution in comments":
       "MEAN(videos.SKEW(comments.likes))",
-    "Average comments per views": "MEAN(videos.comments_rate)",
+    "Average comment rate": "MEAN(videos.comments_rate)",
     "Channel Average likes of comments": "MEAN(comments.likes)",
     "Channel Minimum likes of comments": "MIN(comments.likes)",
     "Channel Average unique commentors":
       "MEAN(videos.NUM_UNIQUE(comments.username))",
     "Average Q scrore": "MEAN(videos.q_score)",
-    "Average Likes per views": "MEAN(videos.likes_rate)",
+    "Average like rate": "MEAN(videos.likes_rate)",
   },
 };

@@ -82,22 +82,22 @@ export interface ChannelType {
 
 export const VideoAvancedDetails = [
   "Skewness of likes distribution in comments",
-  "Comments per views",
+  "Comment rate",
   "Average likes of comments",
   "Minimum likes of comments",
   "Unique commentors",
   "Q scrore",
-  "Likes per views",
+  "Like rate",
 ];
 
 export const ChannelAvancedDetails = [
   "Channel Average skewness of likes distribution in comments",
-  "Average comments per views",
+  "Average comment rate",
   "Channel Average likes of comments",
   "Channel Minimum likes of comments",
   "Channel Average unique commentors",
   "Average Q scrore",
-  "Average Likes per views",
+  "Average like rate",
 ];
 
 export interface Chart {

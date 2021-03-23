@@ -20,6 +20,8 @@ import { ChannelOverviewCard } from "../VideoDetails/VideoDetails";
 import NavBar from "../../components/Navbar/NavBar";
 import Loader from "../../components/Loader/Loader";
 import { videosContext } from "../../Provider/VideosProvider";
+import ScatterCharts from "../../components/ScatterCharts/ScatterCharts";
+import LineCharts from "../../components/LineCharts/LineCharts";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,15 +35,6 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: "2rem",
     },
   },
-  charts: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gridGap: "2rem",
-    ["@media (max-width:700px)"]: {
-      gridTemplateColumns: "1fr",
-      gridGap: "0",
-    },
-  },
   button: {
     textTransform: "none",
     padding: "0.75rem 1rem",
@@ -51,66 +44,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const getOptions = (color: string) => {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    legend: {
-      fontColor: color || "white",
-      labels: {
-        fontColor: color || "white",
-        boxWidth: 0,
-      },
-    },
-    scales: {
-      xAxes: [
-        {
-          ticks: {
-            fontColor: color || "white",
-          },
-          gridLines: {
-            color: "#1e2328",
-          },
-        },
-      ],
-      yAxes: [
-        {
-          ticks: {
-            fontColor: color || "white",
-            beginAtZero: true,
-          },
-          gridLines: {
-            color: "#1e2328",
-          },
-        },
-      ],
-    },
-  };
-};
-
-const filterData = (data: [], chart: Chart) => {
-  return {
-    labels: [...data.map((item) => item["upload_date"])],
-    datasets: [
-      {
-        label: chart.title,
-        data: [...data.map((item) => item[chart.metric])],
-        fill: false,
-        backgroundColor: chart.backgroundColor,
-        borderColor: chart.borderColor,
-      },
-    ],
-  };
-};
-
 function ChannelDetails() {
   const classes = useStyles();
   const url = window.location.hash;
   const id: string = url.substring(url.lastIndexOf("/") + 1);
-  const [data, setData] = useState<[]>([]);
-  const [mainChart, setMainChart] = useState("SKEW(comments.likes)");
   const history = useHistory();
   const searchRef = useRef(null);
+  const [dataForLineCharts, setDataForLineCharts] = useState<[]>([]);
   const channels = React.useContext(channelsContext);
   const videos = React.useContext(videosContext);
   const currentChannel = channels.find((channel) => channel?.channel_id === id);
@@ -118,26 +58,22 @@ function ChannelDetails() {
     "username_channel"
   ];
 
-  useEffect(() => {
-    async function getData() {
-      const parseData = (await readCSV("/video_by_month.csv")) as [];
-      //@ts-ignore
-      setData(parseData.filter((item) => item.channel_id === id));
-      console.log("render");
-    }
-    getData();
-  }, [id]);
-
-  const bigChart =
-    ChannelCharts.find((chart) => chart.metric === mainChart) ||
-    ChannelCharts[0];
-
   const pickAChannel = (): string => {
     const ids = channels.map((channel) => channel.channel_id);
     let channelId = null;
     while (!channelId) channelId = ids[Math.floor(Math.random() * ids.length)];
     return channelId;
   };
+
+  useEffect(() => {
+    async function getData() {
+      const parseData = (await readCSV("/video_by_month.csv")) as [];
+      //@ts-ignore
+      setDataForLineCharts(parseData.filter((item) => item.channel_id === id));
+      console.log("render");
+    }
+    getData();
+  }, [id]);
 
   useEffect(() => {
     if (searchRef.current)
@@ -165,7 +101,7 @@ function ChannelDetails() {
   return (
     <div className={classes.root}>
       <NavBar ref={searchRef}></NavBar>
-      {data && currentChannel ? (
+      {dataForLineCharts && currentChannel ? (
         <Grid container className={classes.body}>
           <Grid
             item
@@ -206,36 +142,15 @@ function ChannelDetails() {
               ))}
             </Grid>
           </Grid>
-          <Grid
-            item
-            xs={12}
-            style={{
-              backgroundColor: "#3b3f46",
-              padding: "0.75rem",
-              borderRadius: "10px",
-            }}
-          >
-            <Line
-              data={filterData(data, bigChart)}
-              height={300}
-              options={getOptions(bigChart.backgroundColor)}
-            ></Line>
+          <Typography variant="h5">Group by month</Typography>
+          <Grid item xs={12}>
+            <LineCharts data={dataForLineCharts}></LineCharts>
           </Grid>
-          <Grid item xs={12} className={classes.charts}>
-            {ChannelCharts.filter((chart) => chart.metric != mainChart).map(
-              (chart) => (
-                <div
-                  key={chart.metric}
-                  onClick={() => setMainChart(chart.metric)}
-                >
-                  <Line
-                    data={filterData(data, chart)}
-                    height={200}
-                    options={getOptions(chart.backgroundColor)}
-                  ></Line>
-                </div>
-              )
-            )}
+          <Typography variant="h5">Per video</Typography>
+          <Grid item xs={12}>
+            <ScatterCharts
+              currentChannel={currentChannel.channel_id as string}
+            ></ScatterCharts>
           </Grid>
         </Grid>
       ) : (
