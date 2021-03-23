@@ -81,7 +81,7 @@ function Comments({ comments }: { comments: CommentType[] }) {
           }}
         >
           <img src={NoComment} className={classes.image}></img>
-          <Typography variant="h5">No comments</Typography>
+          <Typography variant="h5">No liked comments</Typography>
         </div>
       )}
     </>
