@@ -3,8 +3,8 @@ import { ArrowDropUp, ArrowUpward } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
 const useStyles = makeStyles(() => ({
   root: {
-    width: "80px",
-    height: "80px",
+    width: "5rem",
+    height: "5rem",
     borderRadius: "50%",
     justifyContent: "center",
     alignItems: "center",
