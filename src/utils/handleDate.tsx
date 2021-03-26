@@ -1,3 +1,3 @@
 export const handleDate = (d: string) => {
-  return d.trim();
+  return d ? d.trim() : d;
 };

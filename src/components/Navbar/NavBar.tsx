@@ -6,6 +6,7 @@ import Logo from "../../assets/img/logo.png";
 import { ChannelType, VideoType } from "../../types/types";
 import { videosContext } from "../../Provider/VideosProvider";
 import { channelsContext } from "../../Provider/ChannelsProvider";
+import Scroller from "../Scroller/Scroller";
 
 interface Props {
   theme?: "dark" | "light";
@@ -81,6 +82,9 @@ const NavBar = React.forwardRef((props: Props, ref) => {
 
   return (
     <div className={classes.header}>
+      <div style={{ position: "fixed", bottom: "1rem", right: "1rem" }}>
+        <Scroller></Scroller>
+      </div>
       <div className={classes.box}>
         <img
           src={Logo}
@@ -111,6 +115,18 @@ const NavBar = React.forwardRef((props: Props, ref) => {
               }`}
             >
               Channels
+            </Link>
+          </li>
+          <li>
+            <Link
+              to={`/tool`}
+              className={`${classes.navLink} ${
+                window.location.hash.includes("/tool")
+                  ? classes.navLinkActive
+                  : ""
+              }`}
+            >
+              Tool
             </Link>
           </li>
         </ul>

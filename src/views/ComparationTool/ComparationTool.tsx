@@ -25,9 +25,11 @@ import Comments from "../../components/Comments/Comments";
 import { commentsContext } from "../../Provider/CommentsProvider";
 import { PlayArrow } from "@material-ui/icons";
 import { channelsContext } from "../../Provider/ChannelsProvider";
-import { Line } from "react-chartjs-2";
+import { Line, Scatter } from "react-chartjs-2";
 import moment from "moment";
 import { handleDate } from "../../utils/handleDate";
+import { ChannelCharts } from "../../types/types";
+import { readCSV } from "../../utils/readCSV";
 
 const StyledTabs = withStyles({
   indicator: {
@@ -35,9 +37,9 @@ const StyledTabs = withStyles({
     justifyContent: "center",
     backgroundColor: "transparent",
     "& > span": {
-      maxWidth: 40,
+      maxWidth: 150,
       width: "100%",
-      backgroundColor: "#635ee7",
+      backgroundColor: "#dc004e",
     },
   },
 })((props) => <Tabs {...props} TabIndicatorProps={{ children: <span /> }} />);
@@ -49,6 +51,8 @@ const StyledTab = withStyles((theme) => ({
     fontWeight: theme.typography.fontWeightRegular,
     fontSize: theme.typography.pxToRem(15),
     marginRight: theme.spacing(1),
+    padding: "0.75rem 2rem",
+    marginTop: "1.5rem",
     "&:focus": {
       opacity: 1,
     },
@@ -110,19 +114,32 @@ const useChannelStyles = makeStyles(() => ({
       marginBottom: "2rem",
     },
   },
+  chartBox: {
+    color: "#fff",
+    "& :nth-child(1)": {
+      marginBottom: "0.5rem",
+    },
+  },
   rows: {
     display: "flex",
     color: "#fff",
     alignItems: " center",
     gap: "2rem",
+    justifyContent: "flex-end",
   },
 }));
 
-function ComboBox(props: { options: any; getOptionLabel: any; onChange: any }) {
+function ComboBox(props: {
+  options: any;
+  getOptionLabel: any;
+  onChange: any;
+  placeholder?: string;
+}) {
   const classes = useStyles();
 
   return (
     <Autocomplete
+      disableClearable
       color={props.color}
       classes={{
         paper: classes.paper,
@@ -138,6 +155,7 @@ function ComboBox(props: { options: any; getOptionLabel: any; onChange: any }) {
           className={classes.input}
           color={props.color}
           variant="outlined"
+          placeholder={props.placeholder}
           InputLabelProps={{ className: classes.label }}
         />
       )}
@@ -153,7 +171,6 @@ const getOptions = () => {
       fontColor: "white",
       labels: {
         fontColor: "white",
-        boxWidth: 0,
       },
     },
     tooltips: {
@@ -161,6 +178,9 @@ const getOptions = () => {
         title: (toolTipItem, data) => {
           let title = moment(toolTipItem[0].xLabel).format("DD/MM/YYYY"); // uses the x value of this point as the title
           return title;
+        },
+        label: function (tooltipItems, data) {
+          return tooltipItems.yLabel + "";
         },
       },
     },
@@ -193,35 +213,6 @@ const getOptions = () => {
   };
 };
 
-const getLabels = (data: [], type: "line" | "scatter") => {
-  switch (type) {
-    case "scatter":
-      const arr = [
-        ...new Set([
-          ...data.map((item) =>
-            new Date(
-              handleDate(item["MONTH(upload_date)"]) +
-                "/" +
-                handleDate(item["DAY(upload_date)"]) +
-                "/" +
-                handleDate(item["YEAR(upload_date)"])
-            ).getTime()
-          ),
-        ]),
-      ];
-      arr.sort(function (a, b) {
-        return a - b;
-      });
-      return arr;
-
-    case "line":
-      return [...data.map((item) => item["upload_date"])];
-
-    default:
-      return [];
-  }
-};
-
 const getData = (
   data: [],
   title: string,
@@ -233,7 +224,14 @@ const getData = (
     case "line":
       return {
         label: title,
-        data: [...data.map((item) => item[metric])],
+        data: [
+          ...data.map((item) => {
+            return {
+              x: new Date(item["upload_date"]).getTime(),
+              y: item[metric],
+            };
+          }),
+        ],
         fill: false,
         backgroundColor: color,
         borderColor: color,
@@ -277,14 +275,11 @@ const Chart = ({
   metric: string;
 }) => {
   const getDataset = () => {
-    return dataset.map((item) =>
-      item ? getData(item.data, item.title, metric, item.color, type) : {}
-    );
-  };
-  const combineLabels = () => {
-    let labels = [];
-    dataset.forEach((item) => (labels = labels.concat(item?.data)));
-    return labels;
+    return dataset
+      .filter((item) => item !== undefined)
+      .map((item) =>
+        item ? getData(item.data, item.title, metric, item.color, type) : {}
+      );
   };
   return (
     <Grid
@@ -297,14 +292,13 @@ const Chart = ({
         marginBottom: "2rem",
       }}
     >
-      <Line
+      <Scatter
         data={{
-          labels: getLabels(combineLabels(), type),
           datasets: getDataset(),
         }}
         height={350}
         options={getOptions()}
-      ></Line>
+      ></Scatter>
     </Grid>
   );
 };
@@ -315,17 +309,42 @@ function ChannelInfo() {
   const videos: VideoType[] = useContext(videosContext);
   const [channel1, setChannel1] = useState<ChannelType | null>(null);
   const [channel2, setChannel2] = useState<ChannelType | null>(null);
+  const [dataByMonth, setDataByMonth] = useState<[]>([]);
   const [scatterDataset, setScatterDataset] = useState<[]>([]);
+  const [lineDataset, setLineDataset] = useState<[]>([]);
+  console.log(channels);
   const theme = useTheme();
+
+  useEffect(() => {
+    async function getData() {
+      const parseData = (await readCSV("/video_by_month.csv")) as [];
+      //@ts-ignore
+      setDataByMonth(parseData);
+    }
+    getData();
+  }, []);
 
   useEffect(() => {
     setScatterDataset((prevState) => {
       if (!channel1) return prevState;
       const newData = [...prevState];
       newData[0] = {
-        title: channel1.channel_id,
+        title: channel1["username_channel"],
         color: theme.palette.primary.main,
         data: videos.filter((video) => video.channel_id == channel1.channel_id),
+      };
+      return newData;
+    });
+
+    setLineDataset((prevState) => {
+      if (!channel1) return prevState;
+      const newData = [...prevState];
+      newData[0] = {
+        title: channel1["username_channel"],
+        color: theme.palette.primary.main,
+        data: dataByMonth.filter(
+          (item) => item.channel_id == channel1.channel_id
+        ),
       };
       return newData;
     });
@@ -336,9 +355,22 @@ function ChannelInfo() {
       if (!channel2) return prevState;
       const newData = [...prevState];
       newData[1] = {
-        title: channel2.channel_id,
+        title: channel2["username_channel"],
         color: theme.palette.secondary.main,
         data: videos.filter((video) => video.channel_id == channel2.channel_id),
+      };
+      return newData;
+    });
+
+    setLineDataset((prevState) => {
+      if (!channel2) return prevState;
+      const newData = [...prevState];
+      newData[1] = {
+        title: channel2["username_channel"],
+        color: theme.palette.secondary.main,
+        data: dataByMonth.filter(
+          (item) => item.channel_id == channel2.channel_id
+        ),
       };
       return newData;
     });
@@ -352,7 +384,8 @@ function ChannelInfo() {
             onChange={(e, value) => setChannel1(value)}
             options={channels}
             color="primary"
-            getOptionLabel={(option) => option.channel_id}
+            getOptionLabel={(option) => option["username_channel"]}
+            placeholder="Select channel"
           ></ComboBox>
         </Grid>
         <Grid item xs={12} className={classes.rows}>
@@ -361,22 +394,50 @@ function ChannelInfo() {
             options={channels}
             onChange={(e, value) => setChannel2(value)}
             color="secondary"
-            getOptionLabel={(option) => option.channel_id}
+            getOptionLabel={(option) => option["username_channel"]}
+            placeholder="Select channel"
           ></ComboBox>
         </Grid>
-        <Grid item xs={12}>
-          <Chart
-            dataset={scatterDataset}
-            type="scatter"
-            metric="q_score"
-          ></Chart>
-        </Grid>
+
+        {(channel1 || channel2) &&
+          ChannelCharts.map((chart) => (
+            <Grid item xs={12} key={chart.metric} className={classes.chartBox}>
+              <Typography variant="h5">
+                {chart.title + " group by month"}
+              </Typography>
+              <Chart
+                dataset={lineDataset}
+                type="line"
+                metric={chart.metric}
+              ></Chart>
+            </Grid>
+          ))}
+
+        {(channel1 || channel2) &&
+          ChannelCharts.map((chart) => (
+            <Grid item xs={12} key={chart.metric} className={classes.chartBox}>
+              <Typography variant="h5">
+                {chart.title + " group by video"}
+              </Typography>
+              <Chart
+                dataset={scatterDataset}
+                type="scatter"
+                metric={chart.metric}
+              ></Chart>
+            </Grid>
+          ))}
       </Grid>
     </>
   );
 }
 
-function VideoInfo({ color }: { color: "primary" | "secondary" }) {
+function VideoInfo({
+  color,
+  title,
+}: {
+  color: "primary" | "secondary";
+  title?: string;
+}) {
   const classes = useStyles();
   const videos = useContext(videosContext);
   const comments: CommentType[] = useContext(commentsContext);
@@ -396,12 +457,25 @@ function VideoInfo({ color }: { color: "primary" | "secondary" }) {
 
   return (
     <div style={{ padding: "2rem" }} className={classes.rows}>
-      <ComboBox
-        color={color}
-        options={videos}
-        getOptionLabel={(option) => option.id as string}
-        onChange={(event, value) => setCurrentVideo(value)}
-      ></ComboBox>
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          color: "#fff",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography>{title} </Typography>
+        <ComboBox
+          color={color}
+          options={videos}
+          getOptionLabel={(option) => option.id as string}
+          onChange={(event, value) => setCurrentVideo(value)}
+          placeholder="Select video"
+        ></ComboBox>
+      </div>
+
       {currentVideo && (
         <div className={classes.rows}>
           <div className={classes.video}>
@@ -492,17 +566,17 @@ function ComparationTool() {
             onChange={handleChange}
             aria-label="styled tabs example"
           >
-            <StyledTab label="channel" />
-            <StyledTab label="video" />
+            <StyledTab label="Compare two videos" />
+            <StyledTab label="Compare two channels" />
           </StyledTabs>
         </Grid>
-        {value ? (
+        {!value ? (
           <>
             <Grid item xs={6}>
-              <VideoInfo color="primary"></VideoInfo>
+              <VideoInfo color="primary" title="Video 1: "></VideoInfo>
             </Grid>
             <Grid item xs={6}>
-              <VideoInfo color="secondary"></VideoInfo>
+              <VideoInfo color="secondary" title="Video 2: "></VideoInfo>
             </Grid>
           </>
         ) : (

@@ -10,6 +10,7 @@ import Logo from "../../assets/img/logo.png";
 import { channelsContext } from "../../Provider/ChannelsProvider";
 import { YouTube } from "@material-ui/icons";
 import Loader from "../../components/Loader/Loader";
+import Scroller from "../../components/Scroller/Scroller";
 
 const useStyles = makeStyles((theme) => ({
   root: {

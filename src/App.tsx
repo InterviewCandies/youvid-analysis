@@ -32,6 +32,7 @@ function App() {
                   component={ChannelDetails}
                   exact
                 ></Route>
+                <Route path="/tool" component={ComparationTool} exact></Route>
                 <Route path="/404" component={Page404}></Route>
                 <Redirect to="/404"></Redirect>
               </Switch>
