@@ -119,19 +119,31 @@ const NavBar = React.forwardRef((props: Props, ref) => {
           </li>
           <li>
             <Link
-              to={`/tool`}
+              to={`/comparison`}
               className={`${classes.navLink} ${
-                window.location.hash.includes("/tool")
+                window.location.hash.includes("/comparison")
                   ? classes.navLinkActive
                   : ""
               }`}
             >
-              Tool
+              Comparison
+            </Link>
+          </li>
+          <li>
+            <Link
+                to={`/results`}
+                className={`${classes.navLink} ${
+                    window.location.hash.includes("/results")
+                        ? classes.navLinkActive
+                        : ""
+                }`}
+            >
+              Results
             </Link>
           </li>
         </ul>
       </div>
-      <SearchBar ref={ref} theme={props.theme}></SearchBar>
+      {ref && <SearchBar ref={ref} theme={props.theme}></SearchBar>}
     </div>
   );
 });

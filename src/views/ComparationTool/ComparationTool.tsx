@@ -30,6 +30,7 @@ import moment from "moment";
 import { handleDate } from "../../utils/handleDate";
 import { ChannelCharts } from "../../types/types";
 import { readCSV } from "../../utils/readCSV";
+import ComboBox from "../../components/ComboBox/ComboBox";
 
 const StyledTabs = withStyles({
   indicator: {
@@ -128,40 +129,6 @@ const useChannelStyles = makeStyles(() => ({
     justifyContent: "flex-end",
   },
 }));
-
-function ComboBox(props: {
-  options: any;
-  getOptionLabel: any;
-  onChange: any;
-  placeholder?: string;
-}) {
-  const classes = useStyles();
-
-  return (
-    <Autocomplete
-      disableClearable
-      color={props.color}
-      classes={{
-        paper: classes.paper,
-        inputRoot: classes.inputRoot,
-        clearIndicator: classes.clearIndicator,
-        popupIndicator: classes.popupIndicator,
-      }}
-      {...props}
-      style={{ width: 300, color: "#fff" }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          className={classes.input}
-          color={props.color}
-          variant="outlined"
-          placeholder={props.placeholder}
-          InputLabelProps={{ className: classes.label }}
-        />
-      )}
-    />
-  );
-}
 
 const getOptions = () => {
   return {

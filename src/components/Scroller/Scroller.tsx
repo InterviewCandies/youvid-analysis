@@ -3,12 +3,13 @@ import { ArrowDropUp, ArrowUpward } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
 const useStyles = makeStyles(() => ({
   root: {
-    width: "5rem",
-    height: "5rem",
+    width: "4rem",
+    height: "4rem",
     borderRadius: "50%",
     justifyContent: "center",
     alignItems: "center",
     display: "flex",
+    cursor: "pointer",
     backgroundColor: "#dc004e",
     color: "#fff",
   },

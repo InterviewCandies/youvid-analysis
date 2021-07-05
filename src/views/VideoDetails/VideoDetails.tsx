@@ -395,10 +395,6 @@ function VideoDetails() {
                       currentVideo[Mapper["video"][item]] || 0
                     );
                     if (item == "comments") {
-                      console.log(
-                        figure,
-                        currentVideo[Mapper["video"]["views"]]
-                      );
                       figure =
                         (figure *
                           Number(currentVideo[Mapper["video"]["views"]] || 0)) /

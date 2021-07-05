@@ -5,7 +5,7 @@ import { readCSV } from "../utils/readCSV";
 
 export const videosContext = createContext<VideoType[]>([]);
 
-export default function VideosPropider({
+export default function VideosProvider({
   children,
 }: {
   children: JSX.Element;
