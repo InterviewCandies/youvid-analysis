@@ -43,7 +43,7 @@ function MiniCard(props : {title: string, content: string, color: string, active
     const classes = useStyles();
     const theme = useTheme();
 
-    return <Card className={classes.card} style={{backgroundColor: props.color, border: props.active ?  `5px solid ${theme.palette.secondary.dark}` : "none"}}>
+    return <Card className={classes.card} style={{backgroundColor: props.color, border: props.active ?  `5px solid ${theme.palette.primary.dark}` : "none"}}>
         <CardContent>
             <p>{props.title}</p>
             <p style={{fontWeight:"bold", fontSize: "1.2rem", margin: 0}}>{Number(props.content).toFixed(3)}</p>
