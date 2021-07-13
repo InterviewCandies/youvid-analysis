@@ -1,11 +1,13 @@
 //@ts-nocheck
 
-import {Card, CardContent, CardHeader, CircularProgress, Grid, makeStyles, useTheme} from "@material-ui/core";
+import {Button, Card, CardContent, CardHeader, CircularProgress, Grid, makeStyles, useTheme} from "@material-ui/core";
 import NavBar from "../../components/Navbar/NavBar";
 import ComboBox from "../../components/ComboBox/ComboBox";
 import React, {useEffect, useState} from "react";
 import {readCSV} from "../../utils/readCSV";
 import ReactPlayer from "react-player";
+import {TouchApp, Whatshot} from "@material-ui/icons";
+import {useHistory} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -43,9 +45,9 @@ function MiniCard(props : {title: string, content: string, color: string, active
     const classes = useStyles();
     const theme = useTheme();
 
-    return <Card className={classes.card} style={{backgroundColor: props.color, border: props.active ?  `5px solid ${theme.palette.primary.dark}` : "none"}}>
+    return <Card className={classes.card} style={{backgroundColor: props.color}}>
         <CardContent>
-            <p>{props.title}</p>
+            <p style={{display: "flex", alignItems: "center", gap:"0.5rem"}}> {props.active && <span><Whatshot/></span>} {props.title}</p>
             <p style={{fontWeight:"bold", fontSize: "1.2rem", margin: 0}}>{Number(props.content).toFixed(3)}</p>
         </CardContent>
     </Card>
@@ -71,6 +73,14 @@ function Results() {
     const [currentVideo, setCurrentVideo] = useState(null);
     const theme = useTheme();
 
+    const pickAVideo = (): string | undefined => {
+        let selectedVideo = null;
+        while(!selectedVideo)
+            selectedVideo = videos[Math.floor(Math.random() * videos.length)];
+        return selectedVideo;
+    };
+
+
     useEffect(() => {
         async function getData() {
             let parsedData = (await readCSV("/video_score.csv")) as [];
@@ -83,7 +93,7 @@ function Results() {
         <NavBar/>
         <Grid container className={classes.container}>
             <Grid item xs={12} lg={6}>
-                <div style={{margin: "1rem 0 3rem 0"}}>
+                <div style={{margin: "1rem 0 3rem 0", display: "flex", gap: '1rem'}}>
                     <ComboBox
                         color={"secondary"}
                         options={videos}
@@ -91,6 +101,17 @@ function Results() {
                         onChange={(event, value) => setCurrentVideo(value)}
                         placeholder="Select video"
                     ></ComboBox>
+                    <Button
+                        color="secondary"
+                        startIcon={<TouchApp></TouchApp>}
+                        variant="contained"
+                        className={classes.button}
+                        onClick={() => {
+                            setCurrentVideo(pickAVideo());
+                        }}
+                    >
+                        Pick a video
+                    </Button>
                 </div>
                 {currentVideo &&
                     <>
