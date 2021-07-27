@@ -17,32 +17,35 @@ import Page404 from "./views/Page404/Page404";
 import ComparationTool from "./views/ComparationTool/ComparationTool";
 import VideoDetails from "./views/VideoDetails/VideoDetails";
 import Results from "./views/Results/Results";
+import ResultsProvider from "./Provider/ResultsProvider";
 
 function App() {
   return (
-    <ChannelsProvider>
-      <CommentsPropider>
-        <CommentStatsPropider>
-          <VideosPropider>
-            <Router>
-              <Switch>
-                <Route path="/" component={Home} exact></Route>
-                <Route path="/video/:id" component={VideoDetails} exact></Route>
-                <Route
-                  path="/channel/:id"
-                  component={ChannelDetails}
-                  exact
-                ></Route>
-                <Route path="/comparison" component={ComparationTool} exact></Route>
-                <Route path={"/results"} component={Results} exact/>
-                <Route path="/404" component={Page404}></Route>
-                <Redirect to="/404"></Redirect>
-              </Switch>
-            </Router>
-          </VideosPropider>
-        </CommentStatsPropider>
-      </CommentsPropider>
-    </ChannelsProvider>
+      <ResultsProvider>
+        <ChannelsProvider>
+          <CommentsPropider>
+            <CommentStatsPropider>
+              <VideosPropider>
+                <Router>
+                  <Switch>
+                    <Route path="/" component={Home} exact></Route>
+                    <Route path="/video/:id" component={VideoDetails} exact></Route>
+                    <Route
+                      path="/channel/:id"
+                      component={ChannelDetails}
+                      exact
+                    ></Route>
+                    <Route path="/comparison" component={ComparationTool} exact></Route>
+                    <Route path={"/results"} component={Results} exact/>
+                    <Route path="/404" component={Page404}></Route>
+                    <Redirect to="/404"></Redirect>
+                  </Switch>
+                </Router>
+              </VideosPropider>
+            </CommentStatsPropider>
+          </CommentsPropider>
+        </ChannelsProvider>
+      </ResultsProvider>
   );
 }
 

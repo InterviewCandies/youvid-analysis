@@ -8,6 +8,9 @@ import {readCSV} from "../../utils/readCSV";
 import ReactPlayer from "react-player";
 import {TouchApp, Whatshot} from "@material-ui/icons";
 import {useHistory} from "react-router-dom";
+import {VideoType} from "../../types/types";
+import {videosContext} from "../../Provider/VideosProvider";
+import {resultsContext} from "../../Provider/ResultsProvider";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -69,7 +72,7 @@ function getMax(a, b, c) {
 
 function Results() {
     const classes = useStyles();
-    const [videos, setVideos] = useState([]);
+    const videos: VideoType[] = React.useContext(resultsContext);
     const [currentVideo, setCurrentVideo] = useState(null);
     const theme = useTheme();
 
@@ -79,15 +82,6 @@ function Results() {
             selectedVideo = videos[Math.floor(Math.random() * videos.length)];
         return selectedVideo;
     };
-
-
-    useEffect(() => {
-        async function getData() {
-            let parsedData = (await readCSV("/video_score.csv")) as [];
-            setVideos(parsedData);
-        }
-        getData();
-    }, []);
 
     return <div className={classes.root}>
         <NavBar/>

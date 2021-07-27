@@ -80,6 +80,11 @@ export interface ChannelType {
   [key: string]: string | undefined;
 }
 
+export interface ResultsType {
+  [key: string]: string | undefined;
+}
+
+
 export const VideoAvancedDetails = [
   "Skewness of likes distribution in comments",
   "Comment rate",
