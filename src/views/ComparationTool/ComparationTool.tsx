@@ -422,6 +422,12 @@ function VideoInfo({
     );
   }, [currentVideo]);
 
+  function getValue(metric: string) {
+    if (!currentVideo[Mapper["video"][metric]]?.trim().length) return 0;
+    return metric === "comments" ? Math.floor(currentVideo[Mapper["video"][metric]] * currentVideo[Mapper["video"]["views"]] / 1000)
+        : Number(currentVideo[Mapper["video"][metric]]);
+  }
+
   return (
     <div style={{ padding: "2rem" }} className={classes.rows}>
       <div
@@ -479,9 +485,7 @@ function VideoInfo({
                   label={(
                     metric +
                     " : " +
-                    (currentVideo[Mapper["video"][metric]]?.trim().length
-                      ? currentVideo[Mapper["video"][metric]]
-                      : "0")
+                    getValue(metric)
                   ).toLocaleLowerCase()}
                 ></Chip>
               );
