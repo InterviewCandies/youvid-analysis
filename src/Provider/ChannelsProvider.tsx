@@ -1,19 +1,17 @@
 import React, { createContext, useEffect, useState } from "react";
 import { ChannelType } from "../types/types";
-import { readCSV } from "../utils/readCSV";
+import channelData from "../assets/data/channel_profiling.json";
+import buildDataList from "../utils/buildDataList";
 export const channelsContext = createContext<ChannelType[]>([]);
 
 function ChannelsProvider({ children }: { children: JSX.Element }) {
-  const [videos, setVideos] = useState<ChannelType[]>([]);
+  const [channels, setChannels] = useState<ChannelType[]>([]);
   useEffect(() => {
-    async function getData() {
-      let parsedData = (await readCSV("/channels.csv")) as [];
-      setVideos(parsedData);
-    }
-    getData();
+    console.log(buildDataList((channelData)));
+    setChannels(buildDataList(channelData));
   }, []);
   return (
-    <channelsContext.Provider value={videos}>
+    <channelsContext.Provider value={channels}>
       {children}
     </channelsContext.Provider>
   );

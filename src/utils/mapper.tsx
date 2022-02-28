@@ -2,15 +2,16 @@ export const Mapper: { [key: string]: { [key: string]: string } } = {
   video: {
     likes: "like_count",
     dislikes: "dislike_count",
-    comments: "comments_rate",
+    comments: "comment_count",
     views: "view_count",
     "Skewness of likes distribution in comments": "SKEW(comments.likes)",
-    "Comment rate": "comments_rate",
+    "Comment rate": "comment_per_view",
     "Average likes of comments": "MEAN(comments.likes)",
     "Minimum likes of comments": "MIN(comments.likes)",
     "Unique commentors": "NUM_UNIQUE(comments.username)",
-    "Q scrore": "q_score",
-    "Like rate": "likes_rate",
+    "Q score": "q_score",
+    "Like rate": "like_per_view",
+    "Dislike rate": "dislike_per_view"
   },
   channel: {
     videos: "COUNT(videos)",

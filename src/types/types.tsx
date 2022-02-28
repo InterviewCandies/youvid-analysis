@@ -86,12 +86,9 @@ export interface ResultsType {
 
 
 export const VideoAvancedDetails = [
-  "Skewness of likes distribution in comments",
   "Comment rate",
-  "Average likes of comments",
-  "Minimum likes of comments",
-  "Unique commentors",
-  "Q scrore",
+  "Dislike rate",
+  "Q score",
   "Like rate",
 ];
 

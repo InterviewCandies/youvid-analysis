@@ -279,7 +279,6 @@ function ChannelInfo() {
   const [dataByMonth, setDataByMonth] = useState<[]>([]);
   const [scatterDataset, setScatterDataset] = useState<[]>([]);
   const [lineDataset, setLineDataset] = useState<[]>([]);
-  console.log(channels);
   const theme = useTheme();
 
   useEffect(() => {
@@ -351,7 +350,7 @@ function ChannelInfo() {
             onChange={(e, value) => setChannel1(value)}
             options={channels}
             color="primary"
-            getOptionLabel={(option) => option["username_channel"]}
+            getOptionLabel={(option) => option["channel_id"]}
             placeholder="Select channel"
           ></ComboBox>
         </Grid>
@@ -361,7 +360,7 @@ function ChannelInfo() {
             options={channels}
             onChange={(e, value) => setChannel2(value)}
             color="secondary"
-            getOptionLabel={(option) => option["username_channel"]}
+            getOptionLabel={(option) => option["channel_id"]}
             placeholder="Select channel"
           ></ComboBox>
         </Grid>
@@ -407,6 +406,7 @@ function VideoInfo({
 }) {
   const classes = useStyles();
   const videos = useContext(videosContext);
+
   const comments: CommentType[] = useContext(commentsContext);
 
   const [currentVideo, setCurrentVideo] = useState<VideoType | null>(null);
@@ -443,7 +443,7 @@ function VideoInfo({
         <ComboBox
           color={color}
           options={videos}
-          getOptionLabel={(option) => option.id as string}
+          getOptionLabel={(option) => option.id || ""}
           onChange={(event, value) => setCurrentVideo(value)}
           placeholder="Select video"
         ></ComboBox>

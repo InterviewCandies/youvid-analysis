@@ -1,5 +1,5 @@
 import {
-  Button,
+  Button, Chip,
   CircularProgress,
   Grid,
   Icon,
@@ -48,10 +48,17 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(4),
     },
   },
+  tags: {
+    maxWidth: "500px",
+    "& > *": {
+      margin: "0px 8px 8px 0px",
+    }
+  },
   video: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    gap: "20px",
     margin: theme.spacing(5),
   },
   icon: {
@@ -209,6 +216,8 @@ function CardDetails({ video }: { video: VideoType }) {
     gradient: "linear-gradient(to right, #0052d4, #4364f7, #6fb1fc)",
   });
 
+  console.log(video)
+
   return (
     <Grid container className={classes.card}>
       <Typography variant="h5" style={{ fontWeight: 600 }}>
@@ -270,11 +279,6 @@ function VideoDetails() {
   const videos: VideoType[] = React.useContext(videosContext);
   const comments: CommentType[] = React.useContext(commentsContext);
   const channels: ChannelType[] = React.useContext(channelsContext);
-  const commentStats: CommentStatsType[] = React.useContext(
-    commentsStatsContext
-  );
-
-  const [openModal, setOpenModal] = React.useState<boolean>(false);
 
   const url = window.location.hash;
   const id: string = url.substring(url.lastIndexOf("/") + 1);
@@ -282,12 +286,9 @@ function VideoDetails() {
   const currentChannel = channels.find(
     (channel) => channel?.channel_id === currentVideo?.channel_id
   );
-  const currentCommentStats = commentStats.find((item) => item.video_id === id);
 
   const searchRef = useRef(null);
-  const currentComments = comments.length
-    ? comments.filter((comment) => comment?.video_id === id)
-    : null;
+
   const history = useHistory();
 
   const pickAVideo = (): string | undefined => {
@@ -332,7 +333,6 @@ function VideoDetails() {
             <Grid
               item
               xs={12}
-              lg={9}
               spacing={3}
               className={classes.videoSection}
             >
@@ -362,7 +362,7 @@ function VideoDetails() {
                     target="_blank"
                     className={classes.link}
                   >
-                    {currentVideo.username_channel}
+                    {currentVideo.channel_name + ' (' + currentVideo.channel_category  +')'}
                     <Icon color="secondary">
                       <OpenInNew></OpenInNew>
                     </Icon>
@@ -394,12 +394,7 @@ function VideoDetails() {
                     let figure = Number(
                       currentVideo[Mapper["video"][item]] || 0
                     );
-                    if (item == "comments") {
-                      figure =
-                        (figure *
-                          Number(currentVideo[Mapper["video"]["views"]] || 0)) /
-                        1000;
-                    }
+
                     return (
                       <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
                         <Card
@@ -434,6 +429,13 @@ function VideoDetails() {
                     },
                   }}
                 ></ReactPlayer>
+                <div className={classes.tags}>
+                  <h2>Tags</h2>
+                  {
+                    // @ts-ignore
+                    currentVideo.tags?.map(tag => <Chip label={tag}></Chip>)
+                  }
+                </div>
               </div>
               <div>
                 <div className={classes.row}>
@@ -452,47 +454,6 @@ function VideoDetails() {
                   </Grid>
                 </Grid>
               </div>
-            </Grid>
-            <Grid item xs={12} lg={3} className={classes.comments}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "1rem",
-                }}
-              >
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <Icon className={classes.icon}>
-                    <Comment fontSize="small"></Comment>
-                  </Icon>
-                  <Typography variant="h5">Top comments</Typography>
-                </div>
-
-                <Button
-                  onClick={() => setOpenModal(true)}
-                  color="secondary"
-                  style={{ textTransform: "none" }}
-                >
-                  See more
-                </Button>
-              </div>
-
-              {currentCommentStats && (
-                <CommentsDetails
-                  open={openModal}
-                  handleClose={() => setOpenModal(false)}
-                  commentStats={currentCommentStats}
-                ></CommentsDetails>
-              )}
-              {currentComments ? (
-                <Comments comments={currentComments}></Comments>
-              ) : (
-                <div className={classes.loading}>
-                  <CircularProgress color="secondary"></CircularProgress>
-                  <Typography variant="h6">Loading comments...</Typography>
-                </div>
-              )}
             </Grid>
           </Grid>
         </>
