@@ -1,8 +1,11 @@
 import { Grid, makeStyles } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import { Line } from "react-chartjs-2";
-import { ChannelCharts, Chart } from "../../types/types";
+import {ChannelCharts, Chart, VideoType} from "../../types/types";
 import { readCSV } from "../../utils/readCSV";
+import moment from "moment";
+import {videosContext} from "../../Provider/VideosProvider";
+import {groupByMonth} from "../../utils/groupByMonth";
 
 const useStyles = makeStyles(() => ({
   charts: {
@@ -53,13 +56,15 @@ const getOptions = (color: string) => {
   };
 };
 
-const filterData = (data: [], chart: Chart) => {
+const filterData = (data: VideoType[], chart: Chart) => {
+  const groupedData = groupByMonth(data, chart);
+
   return {
-    labels: [...data.map((item) => item["upload_date"])],
+    labels: [...groupedData.map((item) => moment(item["upload_date"]).format("MM-YYYY"))],
     datasets: [
       {
         label: chart.title,
-        data: [...data.map((item) => item[chart.metric])],
+        data: [...groupedData.map((item) => item[chart.metric])],
         fill: false,
         backgroundColor: chart.backgroundColor,
         borderColor: chart.borderColor,
@@ -69,9 +74,13 @@ const filterData = (data: [], chart: Chart) => {
   };
 };
 
-function LineCharts({ data }: { data: [] }) {
+function LineCharts({ currentChannel }: { currentChannel: string }) {
   const classes = useStyles();
-  const [mainChart, setMainChart] = useState("SKEW(comments.likes)");
+  const videos = useContext(videosContext);
+  const data = videos.filter(
+      (video) => video.channel_id === currentChannel
+  );
+  const [mainChart, setMainChart] = useState("q_score");
   const bigChart =
     ChannelCharts.find((chart) => chart.metric === mainChart) ||
     ChannelCharts[0];
@@ -92,7 +101,7 @@ function LineCharts({ data }: { data: [] }) {
           data={filterData(data, bigChart)}
           height={300}
           options={getOptions(bigChart.backgroundColor)}
-        ></Line>
+        />
       </Grid>
       <Grid item xs={12} className={classes.charts}>
         {ChannelCharts.filter((chart) => chart.metric != mainChart).map(
@@ -102,7 +111,7 @@ function LineCharts({ data }: { data: [] }) {
                 data={filterData(data, chart)}
                 height={200}
                 options={getOptions(chart.backgroundColor)}
-              ></Line>
+              />
             </div>
           )
         )}

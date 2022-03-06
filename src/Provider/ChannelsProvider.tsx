@@ -7,8 +7,8 @@ export const channelsContext = createContext<ChannelType[]>([]);
 function ChannelsProvider({ children }: { children: JSX.Element }) {
   const [channels, setChannels] = useState<ChannelType[]>([]);
   useEffect(() => {
-    console.log(buildDataList((channelData)));
-    setChannels(buildDataList(channelData));
+    const data = buildDataList(channelData);
+    setChannels(data);
   }, []);
   return (
     <channelsContext.Provider value={channels}>

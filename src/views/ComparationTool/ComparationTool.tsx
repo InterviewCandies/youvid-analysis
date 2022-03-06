@@ -16,21 +16,16 @@ import {
 } from "@material-ui/core";
 import React, { useContext, useEffect, useState } from "react";
 import NavBar from "../../components/Navbar/NavBar";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import { videosContext } from "../../Provider/VideosProvider";
 import { ChannelType, CommentType, VideoType } from "../../types/types";
 import ReactPlayer from "react-player";
 import { Mapper } from "../../utils/mapper";
-import Comments from "../../components/Comments/Comments";
-import { commentsContext } from "../../Provider/CommentsProvider";
-import { PlayArrow } from "@material-ui/icons";
 import { channelsContext } from "../../Provider/ChannelsProvider";
 import { Line, Scatter } from "react-chartjs-2";
 import moment from "moment";
-import { handleDate } from "../../utils/handleDate";
 import { ChannelCharts } from "../../types/types";
-import { readCSV } from "../../utils/readCSV";
 import ComboBox from "../../components/ComboBox/ComboBox";
+import {groupByMonth} from "../../utils/groupByMonth";
 
 const StyledTabs = withStyles({
   indicator: {
@@ -130,7 +125,7 @@ const useChannelStyles = makeStyles(() => ({
   },
 }));
 
-const getOptions = () => {
+const getOptions = (type: 'line' | 'scatter' = 'line') => {
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -143,7 +138,7 @@ const getOptions = () => {
     tooltips: {
       callbacks: {
         title: (toolTipItem, data) => {
-          let title = moment(toolTipItem[0].xLabel).format("DD/MM/YYYY"); // uses the x value of this point as the title
+          let title = moment(toolTipItem[0].xLabel).format( type === 'scatter' ? "DD/MM/YYYY" : 'MM-YYYY'); // uses the x value of this point as the title
           return title;
         },
         label: function (tooltipItems, data) {
@@ -157,7 +152,7 @@ const getOptions = () => {
           ticks: {
             fontColor: "white",
             callback: function (value) {
-              return moment(value).format("DD/MM/YYYY");
+              return moment(value).format(type === 'scatter' ? "DD/MM/YYYY" : 'MM-YYYY');
             },
           },
           gridLines: {
@@ -192,7 +187,7 @@ const getData = (
       return {
         label: title,
         data: [
-          ...data.map((item) => {
+          ...data.sort((a, b) => a['upload_date'] - b['upload_date']).map((item) => {
             return {
               x: new Date(item["upload_date"]).getTime(),
               y: item[metric],
@@ -210,13 +205,7 @@ const getData = (
         data: [
           ...data.map((item) => {
             return {
-              x: new Date(
-                handleDate(item["MONTH(upload_date)"]) +
-                  "/" +
-                  handleDate(item["DAY(upload_date)"]) +
-                  "/" +
-                  handleDate(item["YEAR(upload_date)"])
-              ).getTime(),
+              x: new Date(item["upload_date"]).getTime(),
               y: item[metric],
             };
           }),
@@ -241,6 +230,12 @@ const Chart = ({
   type: "line | scatter";
   metric: string;
 }) => {
+  if (type === 'line') {
+    dataset = dataset.map(item => ({
+      ...item,
+      data: groupByMonth(item.data, metric)
+    }));
+  }
   const getDataset = () => {
     return dataset
       .filter((item) => item !== undefined)
@@ -264,8 +259,8 @@ const Chart = ({
           datasets: getDataset(),
         }}
         height={350}
-        options={getOptions()}
-      ></Scatter>
+        options={getOptions(type)}
+      />
     </Grid>
   );
 };
@@ -276,26 +271,16 @@ function ChannelInfo() {
   const videos: VideoType[] = useContext(videosContext);
   const [channel1, setChannel1] = useState<ChannelType | null>(null);
   const [channel2, setChannel2] = useState<ChannelType | null>(null);
-  const [dataByMonth, setDataByMonth] = useState<[]>([]);
   const [scatterDataset, setScatterDataset] = useState<[]>([]);
   const [lineDataset, setLineDataset] = useState<[]>([]);
   const theme = useTheme();
-
-  useEffect(() => {
-    async function getData() {
-      const parseData = (await readCSV("/video_by_month.csv")) as [];
-      //@ts-ignore
-      setDataByMonth(parseData);
-    }
-    getData();
-  }, []);
 
   useEffect(() => {
     setScatterDataset((prevState) => {
       if (!channel1) return prevState;
       const newData = [...prevState];
       newData[0] = {
-        title: channel1["username_channel"],
+        title: channel1["channel_name"],
         color: theme.palette.primary.main,
         data: videos.filter((video) => video.channel_id == channel1.channel_id),
       };
@@ -306,9 +291,9 @@ function ChannelInfo() {
       if (!channel1) return prevState;
       const newData = [...prevState];
       newData[0] = {
-        title: channel1["username_channel"],
+        title: channel1["channel_name"],
         color: theme.palette.primary.main,
-        data: dataByMonth.filter(
+        data: videos.filter(
           (item) => item.channel_id == channel1.channel_id
         ),
       };
@@ -321,7 +306,7 @@ function ChannelInfo() {
       if (!channel2) return prevState;
       const newData = [...prevState];
       newData[1] = {
-        title: channel2["username_channel"],
+        title: channel2["channel_name"],
         color: theme.palette.secondary.main,
         data: videos.filter((video) => video.channel_id == channel2.channel_id),
       };
@@ -332,9 +317,9 @@ function ChannelInfo() {
       if (!channel2) return prevState;
       const newData = [...prevState];
       newData[1] = {
-        title: channel2["username_channel"],
+        title: channel2["channel_name"],
         color: theme.palette.secondary.main,
-        data: dataByMonth.filter(
+        data: videos.filter(
           (item) => item.channel_id == channel2.channel_id
         ),
       };
@@ -352,7 +337,7 @@ function ChannelInfo() {
             color="primary"
             getOptionLabel={(option) => option["channel_id"]}
             placeholder="Select channel"
-          ></ComboBox>
+          />
         </Grid>
         <Grid item xs={12} className={classes.rows}>
           <Typography>Channel 2: </Typography>
@@ -362,7 +347,7 @@ function ChannelInfo() {
             color="secondary"
             getOptionLabel={(option) => option["channel_id"]}
             placeholder="Select channel"
-          ></ComboBox>
+          />
         </Grid>
 
         {(channel1 || channel2) &&
@@ -375,7 +360,7 @@ function ChannelInfo() {
                 dataset={lineDataset}
                 type="line"
                 metric={chart.metric}
-              ></Chart>
+              />
             </Grid>
           ))}
 
@@ -389,7 +374,7 @@ function ChannelInfo() {
                 dataset={scatterDataset}
                 type="scatter"
                 metric={chart.metric}
-              ></Chart>
+              />
             </Grid>
           ))}
       </Grid>
@@ -406,26 +391,11 @@ function VideoInfo({
 }) {
   const classes = useStyles();
   const videos = useContext(videosContext);
-
-  const comments: CommentType[] = useContext(commentsContext);
-
   const [currentVideo, setCurrentVideo] = useState<VideoType | null>(null);
-  const [currentComments, setCurrentComments] = useState<CommentType[] | null>(
-    null
-  );
 
-  useEffect(() => {
-    setCurrentComments(
-      comments.length
-        ? comments.filter((comment) => comment?.video_id === currentVideo?.id)
-        : null
-    );
-  }, [currentVideo]);
 
   function getValue(metric: string) {
-    if (!currentVideo[Mapper["video"][metric]]?.trim().length) return 0;
-    return metric === "comments" ? Math.floor(currentVideo[Mapper["video"][metric]] * currentVideo[Mapper["video"]["views"]] / 1000)
-        : Number(currentVideo[Mapper["video"][metric]]);
+    return Number(currentVideo[Mapper["video"][metric]]);
   }
 
   return (
@@ -446,7 +416,7 @@ function VideoInfo({
           getOptionLabel={(option) => option.id || ""}
           onChange={(event, value) => setCurrentVideo(value)}
           placeholder="Select video"
-        ></ComboBox>
+        />
       </div>
 
       {currentVideo && (
@@ -454,14 +424,14 @@ function VideoInfo({
           <div className={classes.video}>
             <ReactPlayer
               url={`https://www.youtube.com/watch?v=${currentVideo.id}`}
-              fallback={<CircularProgress></CircularProgress>}
+              fallback={<CircularProgress/>}
               playing
               config={{
                 youtube: {
                   playerVars: { showinfo: 1 },
                 },
               }}
-            ></ReactPlayer>
+            />
           </div>
           <div
             style={{
@@ -487,31 +457,9 @@ function VideoInfo({
                     " : " +
                     getValue(metric)
                   ).toLocaleLowerCase()}
-                ></Chip>
+                />
               );
             })}
-          </div>
-          <div
-            style={{
-              backgroundColor: "#3b3f46",
-              height: "350px",
-              overflowX: "hidden",
-              overflowY: "auto",
-              padding: "1.5rem",
-              boxSizing: "border-box",
-              color: "#fff",
-              borderRadius: "16px",
-              width: "100%",
-            }}
-          >
-            {currentComments ? (
-              <Comments comments={currentComments}></Comments>
-            ) : (
-              <div className={classes.loading}>
-                <CircularProgress color="secondary"></CircularProgress>
-                <Typography variant="h6">Loading comments...</Typography>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -529,7 +477,7 @@ function ComparationTool() {
 
   return (
     <div className={classes.root}>
-      <NavBar></NavBar>
+      <NavBar/>
       <Grid container>
         <Grid item xs={12}>
           <StyledTabs
@@ -544,15 +492,15 @@ function ComparationTool() {
         {!value ? (
           <>
             <Grid item xs={6}>
-              <VideoInfo color="primary" title="Video 1: "></VideoInfo>
+              <VideoInfo color="primary" title="Video 1: "/>
             </Grid>
             <Grid item xs={6}>
-              <VideoInfo color="secondary" title="Video 2: "></VideoInfo>
+              <VideoInfo color="secondary" title="Video 2: "/>
             </Grid>
           </>
         ) : (
           <Grid ite xs={12}>
-            <ChannelInfo></ChannelInfo>
+            <ChannelInfo/>
           </Grid>
         )}
       </Grid>

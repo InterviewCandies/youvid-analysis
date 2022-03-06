@@ -13,7 +13,8 @@ export default function VideosProvider({
 }) {
   const [videos, setVideos] = React.useState<VideoType[]>([]);
   React.useEffect(() => {
-      setVideos(buildDataList(videoData).filter(item => item?.id));
+      const data = buildDataList(videoData);
+      setVideos(data);
   }, []);
 
   return (

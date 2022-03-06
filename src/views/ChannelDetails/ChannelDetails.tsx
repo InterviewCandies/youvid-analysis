@@ -1,13 +1,11 @@
 import { Button, Grid, makeStyles, Typography } from "@material-ui/core";
 import { TouchApp } from "@material-ui/icons";
 import React, { useEffect, useReducer, useRef, useState } from "react";
-import { Line } from "react-chartjs-2";
-import SearchBar from "../../components/SearchBar/SearchBar";
 import {
   ChannelCharts,
   ChannelOverview,
   ChannelType,
-  Chart,
+  Chart, VideoType,
 } from "../../types/types";
 import { readCSV } from "../../utils/readCSV";
 import Logo from "../../assets/img/logo.png";
@@ -19,7 +17,6 @@ import Card from "../../components/Card/Card";
 import { ChannelOverviewCard } from "../VideoDetails/VideoDetails";
 import NavBar from "../../components/Navbar/NavBar";
 import Loader from "../../components/Loader/Loader";
-import { videosContext } from "../../Provider/VideosProvider";
 import ScatterCharts from "../../components/ScatterCharts/ScatterCharts";
 import LineCharts from "../../components/LineCharts/LineCharts";
 
@@ -50,13 +47,9 @@ function ChannelDetails() {
   const id: string = url.substring(url.lastIndexOf("/") + 1);
   const history = useHistory();
   const searchRef = useRef(null);
-  const [dataForLineCharts, setDataForLineCharts] = useState<[]>([]);
   const channels = React.useContext(channelsContext);
-  const videos = React.useContext(videosContext);
   const currentChannel = channels.find((channel) => channel?.channel_id === id);
-  const channelName = videos.find((video) => video.channel_id === id)?.[
-    "username_channel"
-  ];
+
 
   const pickAChannel = (): string => {
     const ids = channels.map((channel) => channel.channel_id);
@@ -64,16 +57,6 @@ function ChannelDetails() {
     while (!channelId) channelId = ids[Math.floor(Math.random() * ids.length)];
     return channelId;
   };
-
-  useEffect(() => {
-    async function getData() {
-      const parseData = (await readCSV("/video_by_month.csv")) as [];
-      //@ts-ignore
-      setDataForLineCharts(parseData.filter((item) => item.channel_id === id));
-      console.log("render");
-    }
-    getData();
-  }, [id]);
 
   useEffect(() => {
     if (searchRef.current)
@@ -100,8 +83,8 @@ function ChannelDetails() {
 
   return (
     <div className={classes.root}>
-      <NavBar ref={searchRef}></NavBar>
-      {dataForLineCharts && currentChannel ? (
+      <NavBar ref={searchRef}/>
+      { currentChannel ? (
         <Grid container className={classes.body}>
           <Grid
             item
@@ -112,9 +95,9 @@ function ChannelDetails() {
               display: "flex",
             }}
           >
-            <Typography variant="h4">{channelName}</Typography>
+            <Typography variant="h4">{currentChannel.channel_name + ' ('  + currentChannel.channel_category + ')'}</Typography>
             <Button
-              startIcon={<TouchApp></TouchApp>}
+              startIcon={<TouchApp/>}
               variant="contained"
               color="secondary"
               className={classes.button}
@@ -137,24 +120,23 @@ function ChannelDetails() {
                     )}
                     color={ChannelOverview[item].color}
                     endorment={ChannelOverview[item].endorment}
-                  ></Card>
+                  />
                 </Grid>
               ))}
             </Grid>
           </Grid>
           <Typography variant="h5">Group by month</Typography>
           <Grid item xs={12}>
-            <LineCharts data={dataForLineCharts}></LineCharts>
+            <LineCharts currentChannel={currentChannel.channel_id as string}/>
           </Grid>
           <Typography variant="h5">Per video</Typography>
           <Grid item xs={12}>
             <ScatterCharts
-              currentChannel={currentChannel.channel_id as string}
-            ></ScatterCharts>
+              currentChannel={currentChannel.channel_id as string}/>
           </Grid>
         </Grid>
       ) : (
-        <Loader></Loader>
+        <Loader/>
       )}
     </div>
   );

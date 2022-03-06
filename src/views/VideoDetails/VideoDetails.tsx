@@ -12,13 +12,9 @@ import React, { useEffect, useRef } from "react";
 import ReactPlayer from "react-player";
 import { Link, useHistory } from "react-router-dom";
 import Card from "../../components/Card/Card";
-import Comments from "../../components/Comments/Comments";
-import CommentsDetails from "../../components/CommentsDetails/CommentsDetails";
 import Loader from "../../components/Loader/Loader";
 import NavBar from "../../components/Navbar/NavBar";
 import { channelsContext } from "../../Provider/ChannelsProvider";
-import { commentsContext } from "../../Provider/CommentsProvider";
-import { commentsStatsContext } from "../../Provider/CommentStatsProvider";
 import { videosContext } from "../../Provider/VideosProvider";
 import {
   ChannelAvancedDetails,
@@ -216,8 +212,6 @@ function CardDetails({ video }: { video: VideoType }) {
     gradient: "linear-gradient(to right, #0052d4, #4364f7, #6fb1fc)",
   });
 
-  console.log(video)
-
   return (
     <Grid container className={classes.card}>
       <Typography variant="h5" style={{ fontWeight: 600 }}>
@@ -277,7 +271,6 @@ function VideoDetails() {
   const classes = useStyles();
   const [loading, setLoading] = React.useState<Boolean>(true);
   const videos: VideoType[] = React.useContext(videosContext);
-  const comments: CommentType[] = React.useContext(commentsContext);
   const channels: ChannelType[] = React.useContext(channelsContext);
 
   const url = window.location.hash;
@@ -319,7 +312,7 @@ function VideoDetails() {
       };
   }, [searchRef, videos, currentVideo]);
 
-  if (comments.length && !currentVideo) {
+  if (!currentVideo) {
     history.push("/404");
     return null;
   }

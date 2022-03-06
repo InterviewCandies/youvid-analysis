@@ -76,6 +76,10 @@ export interface CommentStatsType {
   [key: string]: string | undefined;
 }
 
+export interface CategoryType {
+  [key: string]: string | undefined;
+}
+
 export interface ChannelType {
   [key: string]: string | undefined;
 }
@@ -93,12 +97,9 @@ export const VideoAvancedDetails = [
 ];
 
 export const ChannelAvancedDetails = [
-  "Channel Average skewness of likes distribution in comments",
   "Average comment rate",
-  "Channel Average likes of comments",
-  "Channel Minimum likes of comments",
-  "Channel Average unique commentors",
-  "Average Q scrore",
+  "Average dislike rate",
+  "Average Q score",
   "Average like rate",
 ];
 
@@ -111,33 +112,27 @@ export interface Chart {
 
 export const ChannelCharts: Chart[] = [
   {
-    metric: "SKEW(comments.likes)",
-    backgroundColor: "rgb(255, 99, 132)",
-    borderColor: "rgba(255, 99, 132, 0.2)",
-    title: "Trend of skewness of likes distribution in comments",
-  },
-  {
     metric: "q_score",
     backgroundColor: "rgb(23, 165, 137 )",
     borderColor: "rgba(23, 165, 137, 0.2)",
     title: "Trend of q score",
   },
   {
-    metric: "likes_rate",
+    metric: "like_per_view",
     backgroundColor: "rgb(165, 105, 189 )",
     borderColor: "rgba(165, 105, 189 , 0.2)",
     title: "Trend of  like rate",
   },
   {
-    metric: "comments_rate",
+    metric: "comment_per_view",
     backgroundColor: "rgb(52, 152, 219 )",
     borderColor: "rgba(52, 152, 219 , 0.2)",
     title: "Trend of comment rate",
   },
   {
-    metric: "NUM_UNIQUE(comments.username)",
-    backgroundColor: "rgb(230, 126, 34)",
-    borderColor: "rgba(230, 126, 34 , 0.2)",
-    title: "Trend of unique commenters",
+    metric: "dislike_per_view",
+    backgroundColor: "rgb(255, 99, 132)",
+    borderColor: "rgba(255, 99, 132, 0.2)",
+    title: "Trend of dislike rate",
   },
 ];

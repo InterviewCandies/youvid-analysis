@@ -91,7 +91,7 @@ const NavBar = React.forwardRef((props: Props, ref) => {
           alt="youvid-analysis"
           className={classes.logo}
           onClick={() => history.push("/")}
-        ></img>
+        />
         <ul className={classes.nav}>
           <li>
             <Link
@@ -115,6 +115,18 @@ const NavBar = React.forwardRef((props: Props, ref) => {
               }`}
             >
               Channels
+            </Link>
+          </li>
+          <li>
+            <Link
+                to={`/categories`}
+                className={`${classes.navLink} ${
+                    window.location.hash.includes("/categories")
+                        ? classes.navLinkActive
+                        : ""
+                }`}
+            >
+              Categories
             </Link>
           </li>
           <li>

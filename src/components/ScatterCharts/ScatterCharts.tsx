@@ -59,11 +59,7 @@ const getData = (videos: VideoType[], chart: Chart) => {
     labels: [
       ...videos.map(
         (item) =>
-          item["DAY(upload_date)"] +
-          "/" +
-          item["MONTH(upload_date)"] +
-          "/" +
-          item["YEAR(upload_date)"]
+          moment(item["upload_date"]).format("DD-MM-YYYY")
       ),
     ],
     datasets: [
@@ -81,7 +77,7 @@ const getData = (videos: VideoType[], chart: Chart) => {
 
 function ScatterCharts({ currentChannel }: { currentChannel: string }) {
   const classes = useStyles();
-  const [mainChart, setMainChart] = useState("SKEW(comments.likes)");
+  const [mainChart, setMainChart] = useState("q_score");
   const videos = useContext(videosContext);
   const filteredVideos = videos.filter(
     (video) => video.channel_id === currentChannel
